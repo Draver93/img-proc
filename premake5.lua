@@ -1,11 +1,11 @@
-workspace "img-deinterlace"
+workspace "img_deinterlace"
     configurations { "Debug", "Release" }
     architecture "x86_64"
-    startproject "imgs-deinterlace"
+    startproject "img_deinterlace"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "img-deinterlace"
+project "img_deinterlace"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
@@ -19,6 +19,7 @@ project "img-deinterlace"
 
     files { "src/**.h", "src/**.cpp" }
     includedirs {
+        "src",
         "external/ffmpeg",
         "external/ffmpeg/include"
     }

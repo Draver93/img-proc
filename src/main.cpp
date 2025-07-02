@@ -1,26 +1,94 @@
-#include <iostream>
+//=============================================
+// 
+// Image Deinterlace Tool
+//---------------------------------------------
+//
+//
+// Author: Finoshkin Aleksei
+//---------------------------------------------
+// 
+// Description:
+//
+// Entry point to the tool that processes an interlaced image and outputs a deinterlaced version.
+// 
+// Better solution:
+// ffmpeg -i interlaced.jpg -frames:v 1 -filter_complex "[0:v]yadif=mode=0[yadif_out];[yadif_out]mcdeint=mode=extra_slow[mcdeint_out];[mcdeint_out]qp=10[result]" -map [result] deinterlaced.jpg
+//=============================================
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
+
+#include "StdAfx.h"
+#include "parser/CommandLineParser.h"
+
+#include "nodes/FFmpegEncNode.h"
+#include "nodes/FFmpegDecNode.h"
+#include "nodes/DeinterlaceProcNode.h"
+
+
+void printHelp() {
+    std::cout << R"(Image Deinterlace Tool
+
+Usage:
+  img_deinterlace --input <input_file> [--output <output_file>]
+  img_deinterlace -i <input_file> [-o <output_file>]
+
+Description:
+  This tool processes an interlaced image and outputs a deinterlaced version.
+
+Options:
+  --input, -i     Path to the input image file. (Required)
+  --output, -o    Path to save the output image file. (Optional, default: output.jpeg)
+  --help, -h      Show this help message and exit.
+
+Example:
+  img_deinterlace --input video_frame.jpeg --output frame_fixed.jpeg
+  img_deinterlace -i frame.jpg
+)";
 }
 
-
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        std::cerr << "Usage: ./image_convert input.jpg output.png\n";
-        return 1;
-    }
+    img_deinterlace::CommandLineParser parser(argc, argv);
+    if (parser.getOptCount() == 0 || parser.hasOption("--help") || parser.hasOption("-h")) { printHelp(); return 0; }
 
-    const char* input_filename = argv[1];
-    const char* output_filename = argv[2];
+    std::string inputFilename;
+    if (parser.hasOption("--input")) inputFilename = parser.getOption("--input");
+    else if(parser.hasOption("-i")) inputFilename = parser.getOption("-i");
+    else { std::cerr << "--input/-i is required(More info: --help/-h)\n"; return 1; }
+
+    std::string outputFilename = "output.jpeg";
+    if (parser.hasOption("--output")) outputFilename = parser.getOption("--output");
+    else if(parser.hasOption("-o")) outputFilename = parser.getOption("-o");
+
+
+    img_deinterlace::PipelineNode rootNode;
+    rootNode.execute();
+    std::string pipelineMode = parser.getOption("--mode", "default");
+    if(pipelineMode == "default") pipelineMode = parser.getOption("-m", "default");
+
+    if(pipelineMode == "default") {
+        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>())->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
+            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>());
+    }
+    else if(pipelineMode == "threads") {
+        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>())->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
+            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>());
+    }
+    else if(pipelineMode == "gpu") {
+        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>())->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
+            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>());
+    }
+    else { std::cerr << "--mode/-m should be one of: [default, threads, gpu]\n"; return 1; }
+
+    rootNode.execute();
+
+
 
     avformat_network_init();
 
     AVFormatContext* fmt_ctx = nullptr;
-    if (avformat_open_input(&fmt_ctx, input_filename, nullptr, nullptr) != 0) {
+    if (avformat_open_input(&fmt_ctx, inputFilename.c_str(), nullptr, nullptr) != 0) {
         std::cerr << "Failed to open input file\n";
         return 1;
     }
@@ -113,6 +181,4 @@ int main(int argc, char* argv[]) {
     av_frame_free(&frame);
     avcodec_free_context(&dec_ctx);
     avformat_close_input(&fmt_ctx);
-
-    return 0;
 }
