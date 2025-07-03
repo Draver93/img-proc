@@ -12,10 +12,11 @@ namespace img_deinterlace {
         ~DeinterlaceProcNode() { }
         
     private:
-        virtual void init() override {
+        virtual void init(std::shared_ptr<const PipelineContext> context) override {
 
         };
         virtual std::unique_ptr<PipelinePacket> updatePacket(std::unique_ptr<PipelinePacket> packet) override {
+            
             return std::move(packet);
         };
     };

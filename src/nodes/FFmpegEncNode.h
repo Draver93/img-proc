@@ -8,20 +8,20 @@ namespace img_deinterlace {
 
     class FFmpegEncNode : public Encoder {
     public:
-        FFmpegEncNode() { 
-
-        }
-        ~FFmpegEncNode() { 
-
-        }
+        FFmpegEncNode(const std::string &fileName) : m_FileName(fileName), m_Packet(av_packet_alloc()), m_File(fileName, std::ios::binary) { }
+        ~FFmpegEncNode();
     private:
-        virtual void init() override {
+        virtual void init(std::shared_ptr<const PipelineContext> context) override;
+        virtual void writePacket(std::unique_ptr<PipelinePacket> packet) override;
 
-        };
-        virtual void writePacket(std::unique_ptr<PipelinePacket> packet) override {
-            
-        };
+    private:
+        std::string m_FileName;
+        std::ofstream m_File;
+        AVPacket* m_Packet = nullptr;
+        AVFormatContext* m_FormatContext = nullptr;
+        AVCodecContext* m_EncoderContext = nullptr;
     };
+
 }
 
 

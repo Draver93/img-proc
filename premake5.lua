@@ -20,8 +20,10 @@ project "img_deinterlace"
     files { "src/**.h", "src/**.cpp" }
     includedirs {
         "src",
-        "external/ffmpeg",
-        "external/ffmpeg/include"
+        "external/ffmpeg/build/include"
+    }
+    libdirs { 
+        "external/ffmpeg/build/lib" 
     }
 
     filter { "configurations:Debug" }
@@ -50,6 +52,7 @@ project "img_deinterlace"
         links {
             "avutil",
             "avcodec",
+            "avdevice",
             "avformat",
             "swscale",
             "swresample",
@@ -59,10 +62,14 @@ project "img_deinterlace"
     filter { "system:linux" }
         defines { "LINUX" }
         links {
-            "avutil",
-            "avcodec",
+            "avfilter",
             "avformat",
-            "swscale",
+            "avcodec",
             "swresample",
-            "avfilter"
+            "swscale",
+            "avutil",
+            "m",
+            "z",
+            "pthread",
+            "dl"
         }

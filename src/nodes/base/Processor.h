@@ -14,12 +14,12 @@ namespace img_deinterlace {
 
     public:
         virtual std::unique_ptr<PipelinePacket> onPacket(std::unique_ptr<PipelinePacket> packet = nullptr) final {
-            if(!m_NodeInit) { init(); m_NodeInit = true; }
+            if(!m_NodeInit) { init(packet->context); m_NodeInit = true; }
             return updatePacket(std::move(packet));
         }
 
     private:
-        virtual void init() = 0;
+        virtual void init(std::shared_ptr<const PipelineContext> context) = 0;
         virtual std::unique_ptr<PipelinePacket> updatePacket(std::unique_ptr<PipelinePacket> packet) = 0;
 
         bool m_NodeInit = false;

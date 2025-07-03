@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <fstream>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
