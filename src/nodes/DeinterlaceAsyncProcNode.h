@@ -1,15 +1,15 @@
-#ifndef IMG_DEINT_PROCESSOR_NODE_H
-#define IMG_DEINT_PROCESSOR_NODE_H
+#ifndef IMG_DEINT_ASYNC_PROCESSOR_NODE_H
+#define IMG_DEINT_ASYNC_PROCESSOR_NODE_H
 
 
 #include "base/Processor.h"
 
 namespace img_deinterlace {
 
-    class DeinterlaceProcNode : public Processor {
+    class DeinterlaceAsyncProcNode : public Processor {
     public:
-        DeinterlaceProcNode();
-        ~DeinterlaceProcNode();
+        DeinterlaceAsyncProcNode();
+        ~DeinterlaceAsyncProcNode();
         
     private:
         void blend(AVFrame* frame);
@@ -20,4 +20,4 @@ namespace img_deinterlace {
 }
 
 
-#endif //!IMG_DEINT_PROCESSOR_NODE_H
+#endif //!IMG_DEINT_ASYNC_PROCESSOR_NODE_H

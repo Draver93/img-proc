@@ -21,7 +21,10 @@
 
 #include "nodes/FFmpegEncNode.h"
 #include "nodes/FFmpegDecNode.h"
+
 #include "nodes/DeinterlaceProcNode.h"
+#include "nodes/DeinterlaceAsyncProcNode.h"
+#include "nodes/DeinterlaceThreadProcNode.h"
 
 
 void printHelp() {
@@ -58,7 +61,6 @@ int main(int argc, char* argv[]) {
     if (parser.hasOption("--output")) outputFilename = parser.getOption("--output");
     else if(parser.hasOption("-o")) outputFilename = parser.getOption("-o");
 
-
     img_deinterlace::PipelineNode rootNode;
     std::string pipelineMode = parser.getOption("--mode", "default");
     if(pipelineMode == "default") pipelineMode = parser.getOption("-m", "default");
@@ -68,9 +70,14 @@ int main(int argc, char* argv[]) {
             setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
             setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
+    else if(pipelineMode == "async") {
+        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceAsyncProcNode>())->
+            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
+    }
     else if(pipelineMode == "threads") {
         rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceThreadProcNode>())->
             setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
     else if(pipelineMode == "gpu") {
@@ -78,7 +85,7 @@ int main(int argc, char* argv[]) {
             setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
             setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
-    else { std::cerr << "--mode/-m should be one of: [default, threads, gpu]\n"; return 1; }
+    else { std::cerr << "--mode/-m should be one of: [default, async, threads, gpu]\n"; return 1; }
 
     rootNode.execute();
 }

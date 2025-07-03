@@ -12,9 +12,7 @@ namespace img_deinterlace {
     void FFmpegEncNode::init(std::shared_ptr<const PipelineContext> context) {
 
         avformat_alloc_output_context2(&m_FormatContext, nullptr, nullptr, m_FileName.c_str());
-        if (!m_FormatContext) {
-            throw std::runtime_error("Failed to detect output format\n");
-        }
+        if (!m_FormatContext) { throw std::runtime_error("Failed to detect output format\n"); }
 
         AVCodecID codecId = m_FormatContext->oformat->video_codec; 
         const AVCodec* encoder = avcodec_find_encoder(codecId);

@@ -19,7 +19,7 @@ namespace img_deinterlace {
         }
 
     private:
-        virtual void init(std::shared_ptr<const PipelineContext> context) = 0;
+        virtual void init(std::shared_ptr<const PipelineContext> context) {};
         virtual std::unique_ptr<PipelinePacket> updatePacket(std::unique_ptr<PipelinePacket> packet) = 0;
 
         bool m_NodeInit = false;
