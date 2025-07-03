@@ -11,7 +11,7 @@ namespace img_deinterlace {
         int width = frame->width;
         int height = frame->height;
 
-        for (int plane = 0; plane < 3; ++plane) {
+        for (int plane = 0; plane < m_PlaneCount; ++plane) {
             uint8_t* data = frame->data[plane];
             int stride = frame->linesize[plane];
 
@@ -23,6 +23,14 @@ namespace img_deinterlace {
                     curr[x] = (curr[x] + prev[x]) / 2;
                 }
             }
+        }
+    }
+
+    void DeinterlaceProcNode::init(std::shared_ptr<const PipelineContext> context) {
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(context->pixelFormat);
+        if (desc) {
+           if (!(desc->flags & AV_PIX_FMT_FLAG_PLANAR)) m_PlaneCount = 1;
+           else m_PlaneCount = desc->nb_components;
         }
     }
 

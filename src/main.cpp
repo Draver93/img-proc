@@ -25,6 +25,7 @@
 #include "nodes/DeinterlaceProcNode.h"
 #include "nodes/DeinterlaceAsyncProcNode.h"
 #include "nodes/DeinterlaceThreadProcNode.h"
+#include "nodes/DeinterlaceGPUProcNode.h"
 
 
 void printHelp() {
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
     }
     else if(pipelineMode == "gpu") {
         rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
+            setNext(std::make_unique<img_deinterlace::DeinterlaceGPUProcNode>())->
             setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
     else { std::cerr << "--mode/-m should be one of: [default, async, threads, gpu]\n"; return 1; }

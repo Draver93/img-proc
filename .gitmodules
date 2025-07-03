@@ -1,3 +1,10 @@
 [submodule "external/ffmpeg"]
 	path = external/ffmpeg
 	url = https://git.ffmpeg.org/ffmpeg.git
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw
+[submodule "external/glad"]
+	path = external/glad
+	url = https://github.com/Dav1dde/glad.git
+	branch = c

@@ -5,6 +5,8 @@ workspace "img_deinterlace"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+dofile("external/glfw-premake5.lua")
+
 project "img_deinterlace"
     kind "ConsoleApp"
     language "C++"
@@ -13,14 +15,17 @@ project "img_deinterlace"
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     staticruntime "On"
     dependson { "ffmpeg" }
+    dependson { "glfw" }
 
     -- Global defines for the entire project
     defines { "NOMINMAX" }
 
-    files { "src/**.h", "src/**.cpp" }
+    files { "src/**.h", "src/**.cpp", "external/glad/src/glad.c" }
     includedirs {
         "src",
-        "external/ffmpeg/build/include"
+        "external/ffmpeg/build/include",
+        "external/glfw/include",
+        "external/glad/include"
     }
     libdirs { 
         "external/ffmpeg/build/lib" 
@@ -49,6 +54,7 @@ project "img_deinterlace"
 
     filter { "system:windows" }
         defines { "WINDOWS" }
+        files { "external/glad/src/glad_wgl.c" }
         links {
             "avutil",
             "avcodec",
@@ -56,11 +62,14 @@ project "img_deinterlace"
             "avformat",
             "swscale",
             "swresample",
-            "avfilter"
+            "avfilter",
+            "glfw",
+            "opengl32"
         }
 
     filter { "system:linux" }
         defines { "LINUX" }
+        files { "external/glad/src/glad_glx.c" }
         links {
             "avfilter",
             "avformat",
@@ -71,5 +80,13 @@ project "img_deinterlace"
             "m",
             "z",
             "pthread",
-            "dl"
+            "dl",
+            "GL",
+            "tbb",
+            "X11",
+            "Xrandr",
+            "Xi",
+            "Xxf86vm",
+            "Xcursor",
+            "glfw"
         }

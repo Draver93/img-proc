@@ -13,7 +13,7 @@ namespace img_deinterlace {
         
     private:
         virtual void init() override;
-        virtual std::unique_ptr<PipelinePacket> getPacket() override ;
+        virtual std::unique_ptr<PipelinePacket> getPacket() override;
 
     private:
         std::string m_FileName;

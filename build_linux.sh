@@ -4,6 +4,18 @@ git submodule update --init --recursive
 
 # FFmpeg
 sudo apt update
+
+sudo apt install -y \
+    build-essential \
+    libtbb-dev \
+    libgl1-mesa-dev \
+    libxxf86vm-dev \
+    libx11-dev \
+    libxcursor-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxi-dev
+
 sudo apt install -y nasm yasm pkg-config \
                 libx264-dev libx265-dev libvpx-dev libfdk-aac-dev \
                 libmp3lame-dev libopus-dev libass-dev libpostproc-dev

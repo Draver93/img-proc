@@ -15,7 +15,12 @@ namespace img_deinterlace {
         void blend(AVFrame* frame);
 
     private:
+        virtual void init(std::shared_ptr<const PipelineContext> context) override;
         virtual std::unique_ptr<PipelinePacket> updatePacket(std::unique_ptr<PipelinePacket> packet) override;
+                        
+    private:
+        int m_PlaneCount = -1;
+        
     };
 }
 

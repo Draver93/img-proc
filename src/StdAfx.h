@@ -1,3 +1,7 @@
+#ifndef STD_AFX_H
+#define STD_AFX_H
+
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -10,3 +14,12 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
+
+#define GLAD_GLX 0
+extern "C" {
+#include <glad/glad.h>
+}
+#include <GLFW/glfw3.h>
+
+
+#endif //!STD_AFX_H

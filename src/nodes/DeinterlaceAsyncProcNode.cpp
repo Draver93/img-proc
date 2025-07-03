@@ -15,7 +15,7 @@ namespace img_deinterlace {
 
         std::vector<std::future<void>> planes_futures;
   
-        for (int plane = 0; plane < 3; ++plane) {
+        for (int plane = 0; plane < m_PlaneCount; ++plane) {
             uint8_t* data = frame->data[plane];
             int stride = frame->linesize[plane];
 
@@ -33,6 +33,14 @@ namespace img_deinterlace {
         }
         for (auto& fut : planes_futures) fut.get();
 
+    }
+
+    void DeinterlaceAsyncProcNode::init(std::shared_ptr<const PipelineContext> context) {
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(context->pixelFormat);
+        if (desc) {
+           if (!(desc->flags & AV_PIX_FMT_FLAG_PLANAR)) m_PlaneCount = 1;
+           else m_PlaneCount = desc->nb_components;
+        }
     }
 
     std::unique_ptr<PipelinePacket> DeinterlaceAsyncProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
