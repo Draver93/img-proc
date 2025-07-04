@@ -82,7 +82,13 @@ namespace img_deinterlace {
         }
 
         if(!m_PipelineContext) {
+            const AVPixFmtDescriptor *pixelFormatDesc = av_pix_fmt_desc_get(m_DecoderContext->pix_fmt);
+            if (!pixelFormatDesc) throw std::runtime_error("Pixel Format Descriptor not found");
+            std::vector<int> linesizes(pixelFormatDesc->nb_components);
+            for(int i = 0; i < linesizes.size(); i++) linesizes.at(i) = frame->linesize[i];
+
             m_PipelineContext = std::make_shared<PipelineContext>(
+                linesizes,
                 frame->width,
                 frame->height,
                 m_DecoderContext->pix_fmt,

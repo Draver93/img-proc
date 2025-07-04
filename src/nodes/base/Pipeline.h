@@ -18,13 +18,14 @@
 namespace img_deinterlace {
     class PipelineContext {
     public:
+        std::vector<int> linesizes;
         int width = 0, height = 0;
         AVPixelFormat pixelFormat;
         AVRational timeBase, aspectRatio, frameRate;
 
     public:
-        PipelineContext(int width, int height, AVPixelFormat pixelFormat, AVRational timeBase, AVRational frameRate):
-            width(width), height(height), pixelFormat(pixelFormat), timeBase(timeBase), frameRate(frameRate) {
+        PipelineContext(const std::vector<int> &linesizes, int width, int height, AVPixelFormat pixelFormat, AVRational timeBase, AVRational frameRate):
+            linesizes(linesizes), width(width), height(height), pixelFormat(pixelFormat), timeBase(timeBase), frameRate(frameRate) {
             aspectRatio = { width, height };
         };
     };

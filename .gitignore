@@ -7,6 +7,8 @@ obj/
 *.obj
 *.exe
 *.jpg
+*.jpeg
+*.png
 *.out
 *.app
 *.dll

@@ -14,7 +14,18 @@
 
 #include "base/Processor.h"
 
+#include <unordered_map>
+
 namespace img_deinterlace {
+
+    struct PairHash {
+        template <typename T1, typename T2>
+        std::size_t operator()(const std::pair<T1, T2>& p) const {
+            std::size_t h1 = std::hash<T1>()(p.first);
+            std::size_t h2 = std::hash<T2>()(p.second);
+            return h1 ^ (h2 << 1); // or use boost::hash_combine style
+        }
+    };
 
     class DeinterlaceGPUProcNode : public Processor {
     public:
@@ -23,10 +34,10 @@ namespace img_deinterlace {
         
     private:
         GLuint m_ShaderProgram;
-        GLuint m_InputTexture, m_OutputTexture;
+        std::unordered_map<std::pair<int, int>, GLuint, PairHash> m_InputTextures, m_OutputTextures;
 
         void compileShader();
-        void createTextures(int w, int h);
+        void createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int h);
         void blend(AVFrame* frame);
 
     private:

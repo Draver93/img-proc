@@ -44,8 +44,9 @@ namespace img_deinterlace {
     DeinterlaceGPUProcNode::DeinterlaceGPUProcNode() { }
     DeinterlaceGPUProcNode::~DeinterlaceGPUProcNode() { 
         if (m_ShaderProgram) glDeleteProgram(m_ShaderProgram);
-        if (m_InputTexture) glDeleteTextures(1, &m_InputTexture);
-        if (m_OutputTexture) glDeleteTextures(1, &m_OutputTexture);
+        for (auto &[key, texture] : m_InputTextures) glDeleteTextures(1, &texture);
+        for (auto &[key, texture] : m_OutputTextures) glDeleteTextures(1, &texture);
+
         if (m_GLFWInstance) {
             glfwDestroyWindow(m_GLFWInstance);
             glfwTerminate();
@@ -73,17 +74,19 @@ namespace img_deinterlace {
         glDeleteShader(shader);
     }
 
-    void DeinterlaceGPUProcNode::createTextures(int w, int h) {
-        glGenTextures(1, &m_InputTexture);
-        glBindTexture(GL_TEXTURE_2D, m_InputTexture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8UI, w, h);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_BYTE, nullptr);
-        glBindImageTexture(0, m_InputTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
+    void DeinterlaceGPUProcNode::createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int height) {
+        for(int plane = 0; plane < desc->nb_components; plane++) {
+            std::pair<int, int> textureSize = { linesizes[plane], (plane > 0 ? height >> m_PixelFormatDesc->log2_chroma_h : height) };
 
-        glGenTextures(1, &m_OutputTexture);
-        glBindTexture(GL_TEXTURE_2D, m_OutputTexture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8UI, w, h);
-        glBindImageTexture(1, m_OutputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8UI);
+            glGenTextures(1, &m_InputTextures[textureSize]);
+            glBindTexture(GL_TEXTURE_2D, m_InputTextures[textureSize]);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8UI, textureSize.first, textureSize.second);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, textureSize.first, textureSize.second, GL_RED_INTEGER, GL_UNSIGNED_BYTE, nullptr);
+
+            glGenTextures(1, &m_OutputTextures[textureSize]);
+            glBindTexture(GL_TEXTURE_2D, m_OutputTextures[textureSize]);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8UI, textureSize.first, textureSize.second);
+        }
     }
 
     void DeinterlaceGPUProcNode::blend(AVFrame* frame) {
@@ -102,29 +105,30 @@ namespace img_deinterlace {
             if (!frame->data[plane]) continue;
             
             uint8_t* data = frame->data[plane];
-            int planeWidth = width >> m_PixelFormatDesc->log2_chroma_w;   
-            int planeHeight = height >> m_PixelFormatDesc->log2_chroma_h;  
+            std::pair<int, int> textureSize = { frame->linesize[plane], (plane > 0 ? height >> m_PixelFormatDesc->log2_chroma_h : height) };
 
-            if (planeWidth <= 0 || planeHeight <= 0) continue;
+            if (textureSize.first <= 0 || textureSize.second <= 0) continue;
 
-            glBindTexture(GL_TEXTURE_2D, m_InputTexture);
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, planeWidth, planeHeight, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data );
+            glBindTexture(GL_TEXTURE_2D, m_InputTextures[textureSize]);
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, textureSize.first, textureSize.second, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data );
+
+            glBindImageTexture(0, m_InputTextures[textureSize], 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
+            glBindImageTexture(1, m_OutputTextures[textureSize], 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
 
             {
                 glUseProgram(m_ShaderProgram);
  
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "height"), planeHeight);
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "width"), planeWidth);
+                glUniform1i(glGetUniformLocation(m_ShaderProgram, "width"), textureSize.first );
+                glUniform1i(glGetUniformLocation(m_ShaderProgram, "height"), textureSize.second );
 
-                int workGroupX = (planeWidth + 31) / 32;
-                int workGroupY = planeHeight;
-
+                int workGroupX = (textureSize.first + 31) / 32;
+                int workGroupY = textureSize.second;
                 glDispatchCompute(workGroupX, workGroupY, 1);
 
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
             }
 
-            glBindTexture(GL_TEXTURE_2D, m_OutputTexture);
+            glBindTexture(GL_TEXTURE_2D, m_OutputTextures[textureSize]);
             glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data);
         }
     }
@@ -165,8 +169,7 @@ namespace img_deinterlace {
         if (!m_PixelFormatDesc) throw std::runtime_error("Pixel Format Descriptor not found");
 
         compileShader();
-
-        createTextures(context->width, context->height);
+        createTextures(m_PixelFormatDesc, context->linesizes, context->height);
     }
 
     std::unique_ptr<PipelinePacket> DeinterlaceGPUProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
