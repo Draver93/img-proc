@@ -60,6 +60,10 @@ namespace img_deinterlace {
         AVStream* video_stream = m_FormatContext->streams[video_stream_index];
         AVFrame *frame = av_frame_alloc();
 
+        if (!frame) {
+            throw std::runtime_error("Failed to allocate frame");
+        }
+
         bool got_frame = false;
         if(av_read_frame(m_FormatContext, m_Packet) >= 0) {
             if (m_Packet->stream_index == video_stream_index) {
@@ -67,12 +71,15 @@ namespace img_deinterlace {
                 if (ret == 0) {
                     ret = avcodec_receive_frame(m_DecoderContext, frame);
                     if (ret == 0) { got_frame = true; }
-                    else if(frame) av_freep(frame);
+                    else if(frame) av_frame_free(&frame);
                 }
             }
             av_packet_unref(m_Packet);
         }
-        if(!got_frame) return nullptr;
+        if(!got_frame) {
+            av_frame_free(&frame);
+            return nullptr;
+        }
 
         if(!m_PipelineContext) {
             m_PipelineContext = std::make_shared<PipelineContext>(

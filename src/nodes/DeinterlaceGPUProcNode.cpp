@@ -87,25 +87,37 @@ namespace img_deinterlace {
     }
 
     void DeinterlaceGPUProcNode::blend(AVFrame* frame) {
+        if (!frame || !frame->data[0]) {
+            throw std::runtime_error("Invalid frame data");
+        }
+
         int width = frame->width;
         int height = frame->height;
 
+        if (width <= 0 || height <= 0) {
+            throw std::runtime_error("Invalid frame dimensions");
+        }
+
         for (int plane = 0; plane < m_PixelFormatDesc->nb_components; ++plane) {
+            if (!frame->data[plane]) continue;
+            
             uint8_t* data = frame->data[plane];
-            width >>= m_PixelFormatDesc->log2_chroma_w;   
-            height >>= m_PixelFormatDesc->log2_chroma_h;  
+            int planeWidth = width >> m_PixelFormatDesc->log2_chroma_w;   
+            int planeHeight = height >> m_PixelFormatDesc->log2_chroma_h;  
+
+            if (planeWidth <= 0 || planeHeight <= 0) continue;
 
             glBindTexture(GL_TEXTURE_2D, m_InputTexture);
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data );
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, planeWidth, planeHeight, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data );
 
             {
                 glUseProgram(m_ShaderProgram);
  
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "height"), height);
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "width"), width);
+                glUniform1i(glGetUniformLocation(m_ShaderProgram, "height"), planeHeight);
+                glUniform1i(glGetUniformLocation(m_ShaderProgram, "width"), planeWidth);
 
-                int workGroupX = (width + 31) / 32;
-                int workGroupY = height;
+                int workGroupX = (planeWidth + 31) / 32;
+                int workGroupY = planeHeight;
 
                 glDispatchCompute(workGroupX, workGroupY, 1);
 
@@ -136,9 +148,18 @@ namespace img_deinterlace {
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw std::runtime_error("Failed to initialize GLAD!" );
 
         const char* glslVersionStr = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-        if(std::stod(glslVersionStr) < 4.3) 
-            throw std::runtime_error("OpenGL Shading Language requires version 4.3 or higher!\nYour current GLSL version is: " + 
-                std::string(glslVersionStr));
+        if (!glslVersionStr) {
+            throw std::runtime_error("Failed to get OpenGL Shading Language version");
+        }
+        
+        try {
+            if(std::stod(glslVersionStr) < 4.3) {
+                throw std::runtime_error("OpenGL Shading Language requires version 4.3 or higher! Your current GLSL version is: " + 
+                    std::string(glslVersionStr));
+            }
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Failed to parse OpenGL Shading Language version: " + std::string(glslVersionStr));
+        }
 
         m_PixelFormatDesc = av_pix_fmt_desc_get(context->pixelFormat);
         if (!m_PixelFormatDesc) throw std::runtime_error("Pixel Format Descriptor not found");

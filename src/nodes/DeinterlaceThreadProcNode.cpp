@@ -9,14 +9,26 @@ namespace img_deinterlace {
     DeinterlaceThreadProcNode::~DeinterlaceThreadProcNode() { }
 
     void DeinterlaceThreadProcNode::blend(AVFrame* frame) {
+        if (!frame || !frame->data[0]) {
+            throw std::runtime_error("Invalid frame data");
+        }
+
         int width = frame->width;
         int height = frame->height;
+
+        if (width <= 0 || height <= 0) {
+            throw std::runtime_error("Invalid frame dimensions");
+        }
 
         std::vector<std::thread> planesThreads;
 
         for (int plane = 0; plane < m_PlaneCount; ++plane) {
+            if (!frame->data[plane]) continue;
+            
             uint8_t* data = frame->data[plane];
             int stride = frame->linesize[plane];
+
+            if (stride <= 0) continue;
 
             planesThreads.emplace_back([data, stride, width, height]() {
                 std::vector<std::thread> linesThreads;
@@ -24,8 +36,10 @@ namespace img_deinterlace {
                     uint8_t* curr = data + y * stride;
                     uint8_t* prev = data + (y - 1) * stride;
 
-                    linesThreads.emplace_back([curr, prev, width]() {
-                        for (int x = 0; x < width; ++x) curr[x] = (curr[x] + prev[x]) / 2;
+                    linesThreads.emplace_back([curr, prev, width, stride]() {
+                        for (int x = 0; x < width && x < stride; ++x) {
+                            curr[x] = (curr[x] + prev[x]) / 2;
+                        }
                     });
                 }
 
