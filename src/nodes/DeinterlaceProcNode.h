@@ -31,6 +31,7 @@ namespace img_deinterlace {
         
     private:
         int m_PlaneCount = -1;
+        int m_Log2ChromaHeight = 0;
     };
 }
 

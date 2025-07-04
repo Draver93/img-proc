@@ -1,4 +1,5 @@
 #include "DeinterlaceGPUProcNode.h"
+#include "../timer/Timer.h"
 
 #include <vector>
 #include <thread>
@@ -90,6 +91,8 @@ namespace img_deinterlace {
     }
 
     void DeinterlaceGPUProcNode::blend(AVFrame* frame) {
+        img_deinterlace::Timer timer("Running blend with mode: GPU");
+
         if (!frame || !frame->data[0]) {
             throw std::runtime_error("Invalid frame data");
         }

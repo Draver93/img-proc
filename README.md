@@ -72,12 +72,12 @@ Below is an example image showing the effect of deinterlacing. The image is wide
 
 ## Processing Modes
 
-| Mode | Description | Performance | Requirements |
-|------|-------------|-------------|--------------|
-| `default` | CPU-based blending | Medium | Any CPU |
-| `async` | Asynchronous processing | High | Multi-core CPU |
-| `threads` | Multi-threaded processing | High | Multi-core CPU |
-| `gpu` | GPU acceleration | Very High | OpenGL 4.3+ |
+| Mode | Description | Requirements |
+|------|-------------|--------------|
+| `default` | CPU-based blending | Any CPU |
+| `async` | Asynchronous processing | Multi-core CPU |
+| `threads` | Multi-threaded processing | Multi-core CPU |
+| `gpu` | GPU acceleration | OpenGL 4.3+ |
 
 ## Command Line Options
 
