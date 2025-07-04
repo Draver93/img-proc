@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
         return 1; 
     }
 
-    std::string outputFilename = "output" + inputFilename.substr(inputFilename.find_last_of('.'));;
+    std::string outputFilename = "output" + inputFilename.substr(inputFilename.find_last_of('.'));
     if (parser.hasOption("--output")) outputFilename = parser.getOption("--output");
     else if(parser.hasOption("-o")) outputFilename = parser.getOption("-o");
 
