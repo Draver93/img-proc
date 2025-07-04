@@ -23,14 +23,18 @@ namespace img_deinterlace {
 	class SingleDashExpression : public Expression {
 	public:
 		void interpret(Context& ctx, const std::vector<std::string>& args) override {
-			std::regex pattern(R"(-(\w+)=(\w+))");
-			for (const auto& arg : args) {
-				std::smatch match;
-				if (std::regex_match(arg, match, pattern)) {
-					ctx.set("-" + match[1].str(), match[2].str());
+			for (size_t i = 0; i < args.size(); ++i) {
+				const std::string& arg = args[i];
+				if (arg.rfind("-", 0) == 0 && arg.rfind("--", 0) != 0) {
+					if (i + 1 < args.size() && args[i + 1].rfind("-", 0) != 0) {
+						ctx.set(arg, args[i + 1]);
+						++i; // skip value
+					} else {
+						ctx.set(arg, "true");
+					}
 				}
 			}
-		}
+    	}
 	};
 
 	CommandLineParser::CommandLineParser(int argc, char* argv[]) {
