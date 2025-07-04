@@ -34,8 +34,5 @@ RUN chmod +x build_linux.sh
 # Run the build script
 RUN ./build_linux.sh
 
-# Make img-deinterlace
-RUN make
-
 # Drop into bash after build
 ENTRYPOINT ["/bin/bash"]

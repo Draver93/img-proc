@@ -11,8 +11,12 @@
 # License: MIT
 # 
 # =============================================================================
+
 git submodule init
 git submodule update --init --recursive
+
+# Accept build configuration as an argument (default: debug)
+BUILD_TYPE=${1:-debug}
 
 # FFmpeg
 sudo apt update
@@ -35,32 +39,51 @@ sudo apt install -y nasm yasm pkg-config \
 
 cd external/ffmpeg
 
-./configure \
-    --enable-static \
-    --disable-shared \
-    --prefix=build/ \
-    --enable-debug=3 \
-    --disable-stripping \
-    --disable-optimizations \
-    --extra-cflags="-g" \
-    --enable-gpl \
-    --enable-nonfree \
-    --enable-static \
-    --disable-shared \
-    --disable-programs \
-    --disable-doc \
-    --enable-protocol=crypto \
-    --enable-protocol=rtp \
-    --enable-demuxer=rtp \
-    --enable-hwaccels \
-    --enable-network \
-    --enable-openssl
+# Set FFmpeg configure flags based on build type
+if [ "$BUILD_TYPE" == "release" ]; then
+    FFMPEG_CONFIG_FLAGS="\
+        --disable-debug \
+        --enable-optimizations \
+        --enable-stripping \
+        --extra-cflags='-O3' \
+        --enable-gpl \
+        --enable-nonfree \
+        --enable-static \
+        --disable-shared \
+        --disable-programs \
+        --disable-doc \
+        --enable-protocol=crypto \
+        --enable-protocol=rtp \
+        --enable-demuxer=rtp \
+        --enable-hwaccels \
+        --enable-network \
+        --enable-openssl"
+else
+    FFMPEG_CONFIG_FLAGS="\
+        --enable-debug=3 \
+        --disable-stripping \
+        --disable-optimizations \
+        --extra-cflags='-g' \
+        --enable-gpl \
+        --enable-nonfree \
+        --enable-static \
+        --disable-shared \
+        --disable-programs \
+        --disable-doc \
+        --enable-protocol=crypto \
+        --enable-protocol=rtp \
+        --enable-demuxer=rtp \
+        --enable-hwaccels \
+        --enable-network \
+        --enable-openssl"
+fi
 
+./configure --prefix=build/ $FFMPEG_CONFIG_FLAGS
 make
 make install
 
 cd ../../
 
-
 # img-deinterlace
 vendor/premake5/premake5a15 gmake2
+make config=$BUILD_TYPE
