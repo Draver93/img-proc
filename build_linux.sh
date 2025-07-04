@@ -30,7 +30,8 @@ sudo apt install -y \
 
 sudo apt install -y nasm yasm pkg-config \
                 libx264-dev libx265-dev libvpx-dev libfdk-aac-dev \
-                libmp3lame-dev libopus-dev libass-dev libpostproc-dev
+                libmp3lame-dev libopus-dev libass-dev libpostproc-dev \
+                libssl-dev
 
 cd external/ffmpeg
 
@@ -51,7 +52,6 @@ cd external/ffmpeg
     --enable-protocol=crypto \
     --enable-protocol=rtp \
     --enable-demuxer=rtp \
-    --enable-crypto \
     --enable-hwaccels \
     --enable-network \
     --enable-openssl
