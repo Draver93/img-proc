@@ -21,6 +21,7 @@
 
 #include "StdAfx.h"
 #include "parser/CommandLineParser.h"
+#include "timer/Timer.h"
 
 #include "nodes/FFmpegEncNode.h"
 #include "nodes/FFmpegDecNode.h"
@@ -74,37 +75,47 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<img_deinterlace::PipelineNode> rootNode = nullptr;
     
     if(pipelineMode == "default") {
+      img_deinterlace::Timer timer("Running pipeline with mode: default");
+
       rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
       std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceProcNode>();
       std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
       processor->setNext(std::move(encoder));
       rootNode->setNext(std::move(processor));
+      rootNode->execute();
     }
     else if(pipelineMode == "async") {
+        img_deinterlace::Timer timer("Running pipeline with mode: async");
+
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
         std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceAsyncProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
+        rootNode->execute();
     }
     else if(pipelineMode == "threads") {
+        img_deinterlace::Timer timer("Running pipeline with mode: threads");
+
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
         std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceThreadProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
+        rootNode->execute();
     }
     else if(pipelineMode == "gpu") {
+        img_deinterlace::Timer timer("Running pipeline with mode: gpu");
+
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
         std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceGPUProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
+        rootNode->execute();
     }
     else { 
         std::cerr << "Error: --mode/-m should be one of: [default, async, threads, gpu]\n"; 
         return 1; 
     }
-
-    rootNode->execute();
 }
