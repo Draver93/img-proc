@@ -9,7 +9,7 @@
 # 
 # Usage:
 #   ./build_linux.sh [debug|release] [clean]
-#   - First argument: build type (default: debug)
+#   - First argument: build type (default: release)
 #   - Second argument: 'clean' to force a clean FFmpeg build
 # 
 # Author: Finoshkin Aleksei
@@ -20,8 +20,8 @@
 git submodule init
 git submodule update --init --recursive
 
-# Accept build configuration as an argument (default: debug)
-BUILD_TYPE=${1:-debug}
+# Accept build configuration as an argument (default: release)
+BUILD_TYPE=${1:-release}
 CLEAN_FFMPEG=${2:-}
 
 # FFmpeg
