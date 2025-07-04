@@ -43,7 +43,7 @@ namespace img_deinterlace {
     protected:
         std::unique_ptr<PipelineNode> m_NextNode;
 
-    public:
+    public: 
         void setNext(std::unique_ptr<PipelineNode> nextNode) { 
             m_NextNode = std::move(nextNode); 
         }
