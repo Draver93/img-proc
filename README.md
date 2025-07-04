@@ -27,6 +27,30 @@ A high-performance C++ tool for deinterlacing interlaced images using multiple p
 
 **Note**: The build script will automatically compile FFmpeg from source in the `external/ffmpeg/` directory.
 
+### Docker Support
+
+A `Dockerfile` is provided for easy building and running of the project in a containerized environment. This is useful if you want to avoid installing dependencies directly on your system.
+
+### Build and Run with Docker
+
+```bash
+# Build the Docker image
+sudo docker build -t img-deinterlace .
+
+# Start a container and open a shell
+sudo docker run -it --rm img-deinterlace
+
+# Inside the container, you can run:
+./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --help
+```
+
+You can also mount a local directory to the container to process your own images:
+
+```bash
+sudo docker run -it --rm -v /path/to/images:/data img-deinterlace \
+  ./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --input /data/in.jpg --output /data/out.jpg
+```
+
 ### Usage
 
 ```bash
