@@ -15,8 +15,8 @@
 git submodule init
 git submodule update --init --recursive
 
-# Accept build configuration as an argument (default: debug)
-BUILD_TYPE=${1:-debug}
+# Accept build configuration as an argument (default: release)
+BUILD_TYPE=${1:-release}
 
 # FFmpeg
 sudo apt update
