@@ -55,7 +55,7 @@ if [ "$BUILD_TYPE" == "release" ]; then
         --disable-debug \
         --enable-optimizations \
         --enable-stripping \
-        --extra-cflags='-O3' \
+        --extra-cflags=-O3 \
         --enable-gpl \
         --enable-nonfree \
         --enable-static \
@@ -73,7 +73,7 @@ else
         --enable-debug=3 \
         --disable-stripping \
         --disable-optimizations \
-        --extra-cflags='-g' \
+        --extra-cflags=-g \
         --enable-gpl \
         --enable-nonfree \
         --enable-static \
