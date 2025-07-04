@@ -64,6 +64,12 @@ img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode gpu
 img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode threads
 ```
 
+## Example Result
+
+Below is an example image showing the effect of deinterlacing. The image is wide, with the original (interlaced) version on the left and the deinterlaced result on the right:
+
+![Deinterlacing Example](examples/example1.jpg)
+
 ## Processing Modes
 
 | Mode | Description | Performance | Requirements |
