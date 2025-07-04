@@ -56,37 +56,44 @@ int main(int argc, char* argv[]) {
     std::string inputFilename;
     if (parser.hasOption("--input")) inputFilename = parser.getOption("--input");
     else if(parser.hasOption("-i")) inputFilename = parser.getOption("-i");
-    else { std::cerr << "--input/-i is required(More info: --help/-h)\n"; return 1; }
+    else { 
+        std::cerr << "Error: --input/-i is required (use --help/-h for more info)\n"; 
+        return 1; 
+    }
 
     std::string outputFilename = "output.jpeg";
     if (parser.hasOption("--output")) outputFilename = parser.getOption("--output");
     else if(parser.hasOption("-o")) outputFilename = parser.getOption("-o");
 
-    img_deinterlace::PipelineNode rootNode;
     std::string pipelineMode = parser.getOption("--mode", "default");
     if(pipelineMode == "default") pipelineMode = parser.getOption("-m", "default");
 
+    std::unique_ptr<img_deinterlace::PipelineNode> rootNode;
+    
     if(pipelineMode == "default") {
-        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>())->
-            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
+        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
+        rootNode->setNext(std::make_unique<img_deinterlace::DeinterlaceProcNode>());
+        rootNode->setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
     else if(pipelineMode == "async") {
-        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceAsyncProcNode>())->
-            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
+        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
+        rootNode->setNext(std::make_unique<img_deinterlace::DeinterlaceAsyncProcNode>());
+        rootNode->setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
     else if(pipelineMode == "threads") {
-        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceThreadProcNode>())->
-            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
+        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
+        rootNode->setNext(std::make_unique<img_deinterlace::DeinterlaceThreadProcNode>());
+        rootNode->setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
     else if(pipelineMode == "gpu") {
-        rootNode.setNext(std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename))->
-            setNext(std::make_unique<img_deinterlace::DeinterlaceGPUProcNode>())->
-            setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
+        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
+        rootNode->setNext(std::make_unique<img_deinterlace::DeinterlaceGPUProcNode>());
+        rootNode->setNext(std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename));
     }
-    else { std::cerr << "--mode/-m should be one of: [default, async, threads, gpu]\n"; return 1; }
+    else { 
+        std::cerr << "Error: --mode/-m should be one of: [default, async, threads, gpu]\n"; 
+        return 1; 
+    }
 
-    rootNode.execute();
+    rootNode->execute();
 }

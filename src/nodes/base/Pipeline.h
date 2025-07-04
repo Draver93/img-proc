@@ -30,12 +30,12 @@ namespace img_deinterlace {
     //Chain of Responsibilities
     class PipelineNode {
     protected:
-        std::shared_ptr<PipelineNode> m_NextNode;
+        std::unique_ptr<PipelineNode> m_NextNode;
 
     public:
-        std::shared_ptr<PipelineNode> setNext(std::shared_ptr<PipelineNode> nextNode) { 
-            m_NextNode = nextNode; 
-            return m_NextNode; 
+        std::unique_ptr<PipelineNode> setNext(std::unique_ptr<PipelineNode> nextNode) { 
+            m_NextNode = std::move(nextNode); 
+            return std::unique_ptr<PipelineNode>(this); 
         }
         virtual std::unique_ptr<PipelinePacket> onPacket(std::unique_ptr<PipelinePacket> packet = nullptr) { 
             return nullptr; 

@@ -7,12 +7,14 @@ namespace img_deinterlace {
 	class DoubleDashExpression : public Expression {
 	public:
 		void interpret(Context& ctx, const std::vector<std::string>& args) override {
-			for (size_t i = 0; i + 1 < args.size(); ++i) {
-				if (args[i].rfind("--", 0) == 0 && args[i + 1].rfind("-", 0) != 0) {
-					ctx.set(args[i], args[i + 1]);
-					++i;
-				} else if (args[i].rfind("--", 0) == 0) {
-					ctx.set(args[i], "true"); // flag without value
+			for (size_t i = 0; i < args.size(); ++i) {
+				if (args[i].rfind("--", 0) == 0) {
+					if (i + 1 < args.size() && args[i + 1].rfind("-", 0) != 0) {
+						ctx.set(args[i], args[i + 1]);
+						++i; // Skip the value in next iteration
+					} else {
+						ctx.set(args[i], "true"); // flag without value
+					}
 				}
 			}
 		}

@@ -48,14 +48,24 @@ namespace img_deinterlace {
         if(!packet) return; 
 
         int ret = avcodec_send_frame(m_EncoderContext, packet->frame);
-        if (ret < 0) { throw std::runtime_error("Error sending a frame for encoding\n"); }
+        if (ret < 0) { 
+            char errbuf[AV_ERROR_MAX_STRING_SIZE];
+            av_strerror(ret, errbuf, AV_ERROR_MAX_STRING_SIZE);
+            throw std::runtime_error("Error sending a frame for encoding: " + std::string(errbuf)); 
+        }
     
         while (ret >= 0) {
             ret = avcodec_receive_packet(m_EncoderContext, m_Packet);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) return;
-            else if (ret < 0) { throw std::runtime_error("Error during encoding\n"); }
+            else if (ret < 0) { 
+                char errbuf[AV_ERROR_MAX_STRING_SIZE];
+                av_strerror(ret, errbuf, AV_ERROR_MAX_STRING_SIZE);
+                throw std::runtime_error("Error during encoding: " + std::string(errbuf)); 
+            }
     
-            m_File.write(reinterpret_cast<const char*>(m_Packet->data), m_Packet->size);
+            if (!m_File.write(reinterpret_cast<const char*>(m_Packet->data), m_Packet->size)) {
+                throw std::runtime_error("Failed to write packet to output file");
+            }
             av_packet_unref(m_Packet);
         }
     }
