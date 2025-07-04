@@ -27,23 +27,43 @@ namespace img_deinterlace {
             avformat_close_input(&m_FormatContext);
             throw std::runtime_error("No streams found in file\n");
         }
-        
-        const AVCodec* decoder = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
 
+        // Find the first video stream
+        int videoStreamIndex = -1;
+        for (unsigned int i = 0; i < m_FormatContext->nb_streams; ++i) {
+            if (m_FormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+                videoStreamIndex = i;
+                break;
+            }
+        }
+
+        if (videoStreamIndex == -1) {
+            avformat_close_input(&m_FormatContext);
+            throw std::runtime_error("No video stream found in file\n");
+        }
+
+        AVCodecParameters* codecpar = m_FormatContext->streams[videoStreamIndex]->codecpar;
+        const AVCodec* decoder = avcodec_find_decoder(codecpar->codec_id);
         if (!decoder) {
             avformat_close_input(&m_FormatContext);
-            throw std::runtime_error("No JPEG decoder available\n");
+            throw std::runtime_error("Failed to find decoder for codec ID " + std::to_string(codecpar->codec_id));
         }
-        
+
         m_DecoderContext = avcodec_alloc_context3(decoder);
         if (!m_DecoderContext) {
             avformat_close_input(&m_FormatContext);
             throw std::runtime_error("Failed to allocate decoder context\n");
         }
 
-        m_DecoderContext->codec_type = AVMEDIA_TYPE_VIDEO;
-        m_DecoderContext->codec_id = decoder->id;
-        
+        ret = avcodec_parameters_to_context(m_DecoderContext, codecpar);
+        if (ret < 0) {
+            char errbuf[AV_ERROR_MAX_STRING_SIZE];
+            av_strerror(ret, errbuf, AV_ERROR_MAX_STRING_SIZE);
+            avcodec_free_context(&m_DecoderContext);
+            avformat_close_input(&m_FormatContext);
+            throw std::runtime_error("Failed to copy codec parameters to decoder context: " + std::string(errbuf) + "\n");
+        }
+
         ret = avcodec_open2(m_DecoderContext, decoder, nullptr);
         if (ret < 0) {
             char errbuf[AV_ERROR_MAX_STRING_SIZE];
@@ -52,9 +72,8 @@ namespace img_deinterlace {
             avformat_close_input(&m_FormatContext);
             throw std::runtime_error("Failed to open decoder: " + std::string(errbuf) + "\n");
         }
-
-
     }
+
     std::unique_ptr<PipelinePacket> FFmpegDecNode::getPacket() {
         int video_stream_index = 0;
         AVStream* video_stream = m_FormatContext->streams[video_stream_index];

@@ -9,6 +9,7 @@ obj/
 *.jpg
 *.jpeg
 *.png
+*.tif
 *.out
 *.app
 *.dll

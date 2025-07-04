@@ -43,7 +43,7 @@ Description:
 
 Options:
   --input, -i     Path to the input image file. (Required)
-  --output, -o    Path to save the output image file. (Optional, default: output.jpeg)
+  --output, -o    Path to save the output image file. (Optional, default: output.${input ext})
   --help, -h      Show this help message and exit.
 
 Example:
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
         return 1; 
     }
 
-    std::string outputFilename = "output.jpeg";
+    std::string outputFilename = "output" + inputFilename.substr(inputFilename.find_last_of('.'));;
     if (parser.hasOption("--output")) outputFilename = parser.getOption("--output");
     else if(parser.hasOption("-o")) outputFilename = parser.getOption("-o");
 
