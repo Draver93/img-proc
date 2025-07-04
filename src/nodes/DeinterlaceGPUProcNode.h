@@ -31,11 +31,8 @@ namespace img_deinterlace {
     public:
         DeinterlaceGPUProcNode();
         ~DeinterlaceGPUProcNode();
-        
+    
     private:
-        GLuint m_ShaderProgram;
-        std::unordered_map<std::pair<int, int>, GLuint, PairHash> m_InputTextures, m_OutputTextures;
-
         void compileShader();
         void createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int h);
         void blend(AVFrame* frame);
@@ -45,9 +42,14 @@ namespace img_deinterlace {
         virtual std::unique_ptr<PipelinePacket> updatePacket(std::unique_ptr<PipelinePacket> packet) override;
                 
     private:
+        GLuint m_ShaderProgram;
+        std::unordered_map<std::pair<int, int>, GLuint, PairHash> m_InputTextures, m_OutputTextures;
+
         GLFWwindow* m_GLFWInstance = nullptr;
         const AVPixFmtDescriptor *m_PixelFormatDesc;
 
+        GLuint m_UniformWidthLoc;
+        GLuint m_UniformHeightLoc;
     };
 }
 

@@ -9,7 +9,7 @@ namespace img_deinterlace {
     const char* blendShaderSource = R"(
         #version 430
 
-        layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+        layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
         // Bindings for 8-bit input/output images
         layout(binding = 0, r8ui) uniform readonly uimage2D inputImage;
@@ -73,6 +73,9 @@ namespace img_deinterlace {
         glAttachShader(m_ShaderProgram, shader);
         glLinkProgram(m_ShaderProgram);
         glDeleteShader(shader);
+
+        m_UniformWidthLoc = glGetUniformLocation(m_ShaderProgram, "width");
+        m_UniformHeightLoc = glGetUniformLocation(m_ShaderProgram, "height");
     }
 
     void DeinterlaceGPUProcNode::createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int height) {
@@ -121,14 +124,14 @@ namespace img_deinterlace {
             {
                 glUseProgram(m_ShaderProgram);
  
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "width"), textureSize.first );
-                glUniform1i(glGetUniformLocation(m_ShaderProgram, "height"), textureSize.second );
+                glUniform1i(m_UniformWidthLoc, textureSize.first );
+                glUniform1i(m_UniformHeightLoc, textureSize.second );
 
-                int workGroupX = (textureSize.first + 31) / 32;
-                int workGroupY = textureSize.second;
+                int workGroupX = (textureSize.first + 15) / 16;
+                int workGroupY = (textureSize.second + 15) / 16;
                 glDispatchCompute(workGroupX, workGroupY, 1);
 
-                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
             }
 
             glBindTexture(GL_TEXTURE_2D, m_OutputTextures[textureSize]);
