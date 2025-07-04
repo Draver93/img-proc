@@ -1,3 +1,14 @@
+/*
+ * GPU Deinterlace Processor Node
+ * ==============================
+ * 
+ * GPU-accelerated deinterlacing implementation using OpenGL compute shaders.
+ * Provides high-performance parallel processing on graphics hardware.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_GPU_PROCESSOR_NODE_H
 #define IMG_DEINT_GPU_PROCESSOR_NODE_H
 

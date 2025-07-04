@@ -1,3 +1,14 @@
+/*
+ * FFmpeg Decoder Node
+ * ===================
+ * 
+ * FFmpeg-based image decoder implementation using libavcodec and libavformat.
+ * Supports various image formats through FFmpeg's decoding capabilities.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_FFMPEG_DEC_NODE_H
 #define IMG_DEINT_FFMPEG_DEC_NODE_H
 

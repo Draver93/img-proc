@@ -1,3 +1,14 @@
+/*
+ * Async Deinterlace Processor Node
+ * =================================
+ * 
+ * Asynchronous deinterlacing implementation using std::async and std::future.
+ * Provides parallel processing capabilities for improved performance.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_ASYNC_PROCESSOR_NODE_H
 #define IMG_DEINT_ASYNC_PROCESSOR_NODE_H
 

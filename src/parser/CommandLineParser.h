@@ -1,3 +1,14 @@
+/*
+ * Command Line Parser
+ * ===================
+ * 
+ * Implements a flexible command-line argument parsing system using the
+ * Interpreter pattern for handling various argument formats.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_COMMAND_LINE_PARSER_H
 #define IMG_DEINT_COMMAND_LINE_PARSER_H
 

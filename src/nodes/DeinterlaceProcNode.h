@@ -1,3 +1,14 @@
+/*
+ * Deinterlace Processor Node
+ * ==========================
+ * 
+ * CPU-based deinterlacing implementation using simple line blending.
+ * Processes interlaced images by blending odd and even scan lines.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_PROCESSOR_NODE_H
 #define IMG_DEINT_PROCESSOR_NODE_H
 

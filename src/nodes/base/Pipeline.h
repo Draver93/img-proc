@@ -1,3 +1,14 @@
+/*
+ * Pipeline Architecture
+ * =====================
+ * 
+ * Implements the Chain of Responsibility pattern for processing image data
+ * through a series of nodes (decoder -> processor -> encoder).
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_PIPELINE_H
 #define IMG_DEINT_PIPELINE_H
 

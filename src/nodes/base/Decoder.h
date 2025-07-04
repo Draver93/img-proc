@@ -1,3 +1,14 @@
+/*
+ * Decoder Base Class
+ * ==================
+ * 
+ * Template Method pattern implementation for image decoders.
+ * Provides a common interface for different decoding strategies.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_DECODER_H
 #define IMG_DEINT_DECODER_H
 

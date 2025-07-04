@@ -1,3 +1,14 @@
+/*
+ * Processor Base Class
+ * ====================
+ * 
+ * Template Method pattern implementation for image processors.
+ * Provides a common interface for different processing strategies.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_PROCESSOR_H
 #define IMG_DEINT_PROCESSOR_H
 

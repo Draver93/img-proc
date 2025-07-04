@@ -1,19 +1,22 @@
-//=============================================
-// 
-// Image Deinterlace Tool
-//---------------------------------------------
-//
-//
-// Author: Finoshkin Aleksei
-//---------------------------------------------
-// 
-// Description:
-//
-// Entry point to the tool that processes an interlaced image and outputs a deinterlaced version.
-// 
-// Better solution:
-// ffmpeg -i interlaced.jpg -frames:v 1 -filter_complex "[0:v]yadif=mode=0[yadif_out];[yadif_out]mcdeint=mode=extra_slow[mcdeint_out];[mcdeint_out]qp=10[result]" -map [result] deinterlaced.jpg
-//=============================================
+/*
+ * Image Deinterlace Tool
+ * ======================
+ * 
+ * A high-performance C++ tool for deinterlacing interlaced images using
+ * multiple processing modes including CPU, GPU, and multi-threaded approaches.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ * 
+ * Description:
+ * Entry point to the tool that processes an interlaced image and outputs 
+ * a deinterlaced version using a pipeline architecture.
+ * 
+ * Alternative FFmpeg solution:
+ * ffmpeg -i interlaced.jpg -frames:v 1 -filter_complex 
+ * "[0:v]yadif=mode=0[yadif_out];[yadif_out]mcdeint=mode=extra_slow[mcdeint_out];
+ * [mcdeint_out]qp=10[result]" -map [result] deinterlaced.jpg
+ */
 
 
 #include "StdAfx.h"

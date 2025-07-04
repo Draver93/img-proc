@@ -1,3 +1,15 @@
+--[[
+ * Premake5 Build Configuration
+ * ============================
+ * 
+ * Build configuration for the Image Deinterlace Tool using Premake5.
+ * Defines project structure, dependencies, and build settings for
+ * Linux platform.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+--]]
+
 workspace "img_deinterlace"
     configurations { "Debug", "Release" }
     architecture "x86_64"

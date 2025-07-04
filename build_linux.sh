@@ -1,4 +1,16 @@
 #!/bin/bash
+# =============================================================================
+# 
+# Linux Build Script for Image Deinterlace Tool
+# =============================================
+# 
+# Automated build script for compiling the image deinterlace tool on Linux
+# systems. Handles FFmpeg compilation and project building.
+# 
+# Author: Finoshkin Aleksei
+# License: MIT
+# 
+# =============================================================================
 git submodule init
 git submodule update --init --recursive
 

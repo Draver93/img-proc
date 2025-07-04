@@ -1,3 +1,14 @@
+/*
+ * FFmpeg Encoder Node
+ * ===================
+ * 
+ * FFmpeg-based image encoder implementation using libavcodec and libavformat.
+ * Supports various output formats through FFmpeg's encoding capabilities.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_FFMPEG_ENC_NODE_H
 #define IMG_DEINT_FFMPEG_ENC_NODE_H
 

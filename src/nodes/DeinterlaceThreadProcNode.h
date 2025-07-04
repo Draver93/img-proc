@@ -1,3 +1,14 @@
+/*
+ * Thread Deinterlace Processor Node
+ * ==================================
+ * 
+ * Multi-threaded deinterlacing implementation using std::thread.
+ * Provides explicit thread management for parallel processing.
+ * 
+ * Author: Finoshkin Aleksei
+ * License: MIT
+ */
+
 #ifndef IMG_DEINT_THREAD_PROCESSOR_NODE_H
 #define IMG_DEINT_THREAD_PROCESSOR_NODE_H
 
