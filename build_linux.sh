@@ -7,6 +7,11 @@
 # Automated build script for compiling the image deinterlace tool on Linux
 # systems. Handles FFmpeg compilation and project building.
 # 
+# Usage:
+#   ./build_linux.sh [debug|release] [clean]
+#   - First argument: build type (default: debug)
+#   - Second argument: 'clean' to force a clean FFmpeg build
+# 
 # Author: Finoshkin Aleksei
 # License: MIT
 # 
@@ -15,13 +20,14 @@
 git submodule init
 git submodule update --init --recursive
 
-# Accept build configuration as an argument (default: release)
-BUILD_TYPE=${1:-release}
+# Accept build configuration as an argument (default: debug)
+BUILD_TYPE=${1:-debug}
+CLEAN_FFMPEG=${2:-}
 
 # FFmpeg
-sudo apt update
+apt-get update
 
-sudo apt install -y \
+apt-get install -y \
     build-essential \
     libtbb-dev \
     libgl1-mesa-dev \
@@ -32,12 +38,16 @@ sudo apt install -y \
     libxinerama-dev \
     libxi-dev
 
-sudo apt install -y nasm yasm pkg-config \
+apt-get install -y nasm yasm pkg-config \
                 libx264-dev libx265-dev libvpx-dev libfdk-aac-dev \
                 libmp3lame-dev libopus-dev libass-dev libpostproc-dev \
                 libssl-dev
 
 cd external/ffmpeg
+
+if [ "$CLEAN_FFMPEG" == "clean" ]; then
+    make distclean || true
+fi
 
 # Set FFmpeg configure flags based on build type
 if [ "$BUILD_TYPE" == "release" ]; then
