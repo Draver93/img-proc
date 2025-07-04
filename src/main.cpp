@@ -44,6 +44,7 @@ Description:
 Options:
   --input, -i     Path to the input image file. (Required)
   --output, -o    Path to save the output image file. (Optional, default: output.jpeg)
+  --mode, -m      Processing mode: default, async, threads, gpu (Optional, default: default)
   --help, -h      Show this help message and exit.
 
 Example:
