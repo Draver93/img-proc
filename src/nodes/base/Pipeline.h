@@ -44,11 +44,8 @@ namespace img_deinterlace {
         std::unique_ptr<PipelineNode> m_NextNode;
 
     public:
-        virtual ~PipelineNode() = default;
-        
-        std::unique_ptr<PipelineNode> setNext(std::unique_ptr<PipelineNode> nextNode) { 
+        void setNext(std::unique_ptr<PipelineNode> nextNode) { 
             m_NextNode = std::move(nextNode); 
-            return std::unique_ptr<PipelineNode>(this); 
         }
         virtual std::unique_ptr<PipelinePacket> onPacket(std::unique_ptr<PipelinePacket> packet = nullptr) { 
             return nullptr; 
