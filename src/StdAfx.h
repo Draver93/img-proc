@@ -33,5 +33,7 @@ extern "C" {
 }
 #include <GLFW/glfw3.h>
 
+#include "utils/Timer.h"
+#include "utils/MemoryProfiler.h"
 
 #endif //!STD_AFX_H

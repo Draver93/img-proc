@@ -1,5 +1,4 @@
 #include "DeinterlaceProcNode.h"
-#include "../timer/Timer.h"
 
 namespace img_deinterlace {
 

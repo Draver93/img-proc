@@ -1,5 +1,4 @@
 #include "DeinterlaceThreadProcNode.h"
-#include "../timer/Timer.h"
 
 #include <vector>
 #include <thread>

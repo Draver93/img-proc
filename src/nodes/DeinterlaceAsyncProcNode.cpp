@@ -1,5 +1,4 @@
 #include "DeinterlaceAsyncProcNode.h"
-#include "../timer/Timer.h"
 
 #include <algorithm>
 #include <future>

@@ -18,10 +18,10 @@
  * [mcdeint_out]qp=10[result]" -map [result] deinterlaced.jpg
  */
 
+ //#define TRACK_MEMORY
 
 #include "StdAfx.h"
 #include "parser/CommandLineParser.h"
-#include "timer/Timer.h"
 
 #include "nodes/FFmpegEncNode.h"
 #include "nodes/FFmpegDecNode.h"
