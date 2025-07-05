@@ -4,10 +4,10 @@ A high-performance C++ tool for deinterlacing interlaced images using multiple p
 
 ## Features
 
-- **Multiple Processing Modes**: CPU, GPU (OpenGL), async, and multi-threaded deinterlacing
+- **Multiple Processing Modes**: CPU, GPU (OpenGL), async, multi-threaded, and SIMD deinterlacing
 - **FFmpeg Integration**: Built on FFmpeg for robust image format support
 - **Linux Support**: Optimized for Linux systems
-- **High Performance**: GPU acceleration with OpenGL compute shaders
+- **High Performance**: GPU acceleration with OpenGL compute shaders and SIMD vectorization
 - **Pipeline Architecture**: Modular design for easy extension
 
 ## Quick Start
@@ -17,6 +17,7 @@ A high-performance C++ tool for deinterlacing interlaced images using multiple p
 - **Linux**: GCC 7+ or Clang 8+
 - **FFmpeg**: Built from source (included in external/ffmpeg/)
 - **OpenGL**: 4.3+ for GPU mode (optional)
+- **CPU**: AVX2 support for SIMD mode (optional)
 
 ### Building
 
@@ -62,6 +63,9 @@ img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode gpu
 
 # Multi-threaded processing
 img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode threads
+
+# SIMD-optimized processing
+img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode simd
 ```
 
 ## Example Result
@@ -78,13 +82,14 @@ Below is an example image showing the effect of deinterlacing. The image is wide
 | `async` | Asynchronous processing | Multi-core CPU |
 | `threads` | Multi-threaded processing | Multi-core CPU |
 | `gpu` | GPU acceleration | OpenGL 4.3+ |
+| `simd` | SIMD-optimized processing | CPU with AVX2 support |
 
 ## Command Line Options
 
 ```
 --input, -i     Input image file (required)
 --output, -o    Output image file (default: output.jpeg)
---mode, -m      Processing mode: default, async, threads, gpu
+--mode, -m      Processing mode: default, async, threads, gpu, simd
 --help, -h      Show help message
 ```
 
@@ -113,6 +118,13 @@ The deinterlacing algorithm blends odd and even scan lines:
 - Even lines (0, 2, 4...) remain unchanged
 - Odd lines (1, 3, 5...) are blended with the previous line: `new = (current + previous) / 2`
 
+### SIMD Optimization
+
+The SIMD mode uses AVX2 instructions to process 32 pixels simultaneously:
+- Vectorized blending using `_mm256_avg_epu8` for optimal performance
+- Automatic fallback to scalar processing for edge cases
+- Compatible with all pixel formats supported by FFmpeg
+
 ## Development
 
 ### Project Structure
@@ -139,6 +151,11 @@ src/
 - Ensure OpenGL 4.3+ is available
 - Check GPU drivers are up to date
 - Verify compute shader support
+
+### SIMD Mode Issues
+- Ensure CPU supports AVX2 instructions
+- Check compiler supports AVX2 intrinsics
+- Verify `USE_SIMD` define is set during compilation
 
 ### Build Issues
 - Ensure all dependencies are properly linked
