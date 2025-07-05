@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     libmp3lame-dev libopus-dev libass-dev libpostproc-dev \
     git \
     dos2unix \
+    xvfb \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory

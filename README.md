@@ -52,6 +52,8 @@ sudo docker run -it --rm -v /path/to/images:/data img-deinterlace \
   ./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --input /data/in.jpg --output /data/out.jpg
 ```
 
+**Note**: For GPU mode in Docker, you'll need to start a virtual display server (Xvfb). See the [Troubleshooting](#troubleshooting) section for details.
+
 ### Usage
 
 ```bash
@@ -151,6 +153,19 @@ src/
 - Ensure OpenGL 4.3+ is available
 - Check GPU drivers are up to date
 - Verify compute shader support
+
+#### Docker GPU Mode
+When running GPU mode in Docker containers, you need to start a virtual display server:
+
+```bash
+# Run container with GPU mode
+docker run -it --rm img-deinterlace bash
+
+# Inside container, start Xvfb and run the tool
+export DISPLAY=:99
+Xvfb :99 -screen 0 1024x768x24 &
+./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --input input.jpg --output output.jpg --mode gpu
+```
 
 ### SIMD Mode Issues
 - Ensure CPU supports AVX2 instructions
