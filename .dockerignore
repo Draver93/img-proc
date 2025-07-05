@@ -1,0 +1,43 @@
+# Git files
+.git
+.gitignore
+
+# Build artifacts
+bin/
+obj/
+build/
+*.o
+*.a
+*.so
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Documentation
+README.md
+LICENSE
+*.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# External dependencies (will be built inside container)
+external/ffmpeg/
+external/glfw/
+external/glad/
+
+# Examples (optional - remove if you want to include them)
+examples/ 

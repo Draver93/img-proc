@@ -1,3 +1,4 @@
+# Use LF line endings for cross-platform compatibility
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -20,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     libx264-dev libx265-dev libvpx-dev libfdk-aac-dev \
     libmp3lame-dev libopus-dev libass-dev libpostproc-dev \
     git \
+    dos2unix \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -28,11 +30,12 @@ WORKDIR /app
 # Copy everything into container
 COPY . .
 
-# Make the build script executable
+# Ensure build script has correct line endings and is executable
+RUN dos2unix build_linux.sh 2>/dev/null || true
 RUN chmod +x build_linux.sh
 
 # Run the build script
-RUN ./build_linux.sh
+RUN ./build_linux.sh release
 
 # Drop into bash after build
 ENTRYPOINT ["/bin/bash"]
