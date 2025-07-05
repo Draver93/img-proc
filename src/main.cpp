@@ -30,14 +30,14 @@
 #include "nodes/DeinterlaceAsyncProcNode.h"
 #include "nodes/DeinterlaceThreadProcNode.h"
 #include "nodes/DeinterlaceGPUProcNode.h"
-
+#include "nodes/DeinterlaceSIMDProcNode.h"
 
 void printHelp() {
     std::cout << R"(Image Deinterlace Tool
 
 Usage:
-  img_deinterlace --input <input_file> [--output <output_file>]
-  img_deinterlace -i <input_file> [-o <output_file>]
+  img_deinterlace --input <input_file> [--output <output_file>] [--mode <mode>]
+  img_deinterlace -i <input_file> [-o <output_file>] [-m <mode>]
 
 Description:
   This tool processes an interlaced image and outputs a deinterlaced version.
@@ -45,11 +45,21 @@ Description:
 Options:
   --input, -i     Path to the input image file. (Required)
   --output, -o    Path to save the output image file. (Optional, default: output.${input ext})
+  --mode, -m      Processing mode to use. (Optional, default: default)
+                  Available modes: default, async, threads, gpu, simd
   --help, -h      Show this help message and exit.
 
+Processing Modes:
+  default         Standard CPU processing (single-threaded)
+  async           Asynchronous processing with background threads
+  threads         Multi-threaded processing 
+  gpu             GPU-accelerated processing using OpenGL/OpenCL
+  simd            SIMD-optimized processing using CPU vector instructions
+
 Example:
-  img_deinterlace --input video_frame.jpeg --output frame_fixed.jpeg
-  img_deinterlace -i frame.jpg
+  img_deinterlace --input video_frame.jpeg --output frame_fixed.jpeg --mode simd
+  img_deinterlace -i frame.jpg -m gpu
+  img_deinterlace --input interlaced.png --mode threads
 )";
 }
 
@@ -114,8 +124,22 @@ int main(int argc, char* argv[]) {
         rootNode->setNext(std::move(processor));
         rootNode->execute();
     }
+    else if(pipelineMode == "simd") {
+      #ifdef USE_SIMD
+        img_deinterlace::Timer timer("Running pipeline with mode: SIMD");
+
+        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
+        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceSIMDProcNode>();
+        std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+        processor->setNext(std::move(encoder));
+        rootNode->setNext(std::move(processor));
+        rootNode->execute();
+      #else 
+        std::cerr << "Error: --mode/-m simd is not supported\n"; 
+      #endif
+    }
     else { 
-        std::cerr << "Error: --mode/-m should be one of: [default, async, threads, gpu]\n"; 
+        std::cerr << "Error: --mode/-m should be one of: [default, async, threads, gpu, simd]\n"; 
         return 1; 
     }
 }

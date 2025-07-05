@@ -10,6 +10,11 @@
  * License: MIT
 --]]
 
+newoption {
+    trigger = "simd",
+    description = "Enable SIMD (AVX2) support for image processing"
+}
+
 workspace "img_deinterlace"
     configurations { "Debug", "Release" }
     architecture "x86_64"
@@ -63,6 +68,15 @@ project "img_deinterlace"
     filter { "configurations:Release", "system:linux"}
         buildoptions { "-static-libgcc", "-static-libstdc++" }
 
+-- Enable SIMD (AVX2) 
+if _OPTIONS["simd"] then
+    defines { "USE_SIMD" }
+    filter { "system:linux" }
+        buildoptions { "-mavx2" }
+    filter { "system:windows" }
+        buildoptions { "/arch:AVX2" }
+    filter {} 
+end
 
     filter { "system:windows" }
         defines { "WINDOWS" }
