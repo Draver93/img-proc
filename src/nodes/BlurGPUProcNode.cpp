@@ -5,40 +5,59 @@
 
 namespace media_proc {
 
-    const char* blendShaderSource = R"(
-        #version 430
+const char* blurShaderSource = R"(
+    #version 430
+    layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-        layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+    // Bindings for 8-bit input/output images
+    layout(binding = 0, r8ui) uniform readonly uimage2D inputImage;
+    layout(binding = 1, r8ui) uniform writeonly uimage2D outputImage;
 
-        // Bindings for 8-bit input/output images
-        layout(binding = 0, r8ui) uniform readonly uimage2D inputImage;
-        layout(binding = 1, r8ui) uniform writeonly uimage2D outputImage;
+    uniform int width;
+    uniform int height;
 
-        uniform int width;
-        uniform int height;
+    // 3x3 Gaussian kernel weights (scaled by 256 for integer math)
+    const int kernel[9] = int[9](
+        16, 32, 16,    // 1/16, 2/16, 1/16
+        32, 64, 32,    // 2/16, 4/16, 2/16
+        16, 32, 16     // 1/16, 2/16, 1/16
+    );
 
-        void main() {
-            uint x = gl_GlobalInvocationID.x;
-            uint y = gl_GlobalInvocationID.y;
+    // Kernel offsets for 3x3 neighborhood
+    const ivec2 offsets[9] = ivec2[9](
+        ivec2(-1, -1), ivec2( 0, -1), ivec2( 1, -1),
+        ivec2(-1,  0), ivec2( 0,  0), ivec2( 1,  0),
+        ivec2(-1,  1), ivec2( 0,  1), ivec2( 1,  1)
+    );
 
-            if (x >= uint(width) || y >= uint(height)) return;
-
-            ivec2 coord = ivec2(x, y);
-
-            if (y % 2 == 1) {
-                // Read current and previous rows
-                uint currValue = imageLoad(inputImage, coord).r;
-                uint prevValue = imageLoad(inputImage, ivec2(x, y - 1)).r;
-
-                // Blend and write result
-                uint blended = (currValue + prevValue) / 2;
-                imageStore(outputImage, coord, uvec4(blended, 0, 0, 0));
-            } else {
-                // Copy original pixel
-                uint value = imageLoad(inputImage, coord).r;
-                imageStore(outputImage, coord, uvec4(value, 0, 0, 0));
-            }
+    void main() {
+        uint x = gl_GlobalInvocationID.x;
+        uint y = gl_GlobalInvocationID.y;
+        
+        if (x >= uint(width) || y >= uint(height)) return;
+        
+        ivec2 coord = ivec2(x, y);
+        
+        // Handle border pixels - just copy original
+        if (x == 0 || y == 0 || x == uint(width - 1) || y == uint(height - 1)) {
+            uint value = imageLoad(inputImage, coord).r;
+            imageStore(outputImage, coord, uvec4(value, 0, 0, 0));
+            return;
         }
+        
+        // Apply 3x3 Gaussian blur
+        uint sum = 0;
+        
+        for (int i = 0; i < 9; i++) {
+            ivec2 sampleCoord = coord + offsets[i];
+            uint pixelValue = imageLoad(inputImage, sampleCoord).r;
+            sum += pixelValue * uint(kernel[i]);
+        }
+        
+        // Divide by 256 (total kernel weight) and store result
+        uint blurred = sum >> 8;  // Equivalent to sum / 256
+        imageStore(outputImage, coord, uvec4(blurred, 0, 0, 0));
+    }
     )";
 
     BlurGPUProcNode::BlurGPUProcNode() { }

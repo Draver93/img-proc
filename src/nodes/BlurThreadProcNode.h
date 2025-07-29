@@ -19,26 +19,99 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <cstring>
 #include <functional>
 #include <condition_variable>
 
 namespace media_proc {
+
     class ThreadPool {
-    public:
-        ThreadPool(size_t numThreads);
-        ~ThreadPool();
-
-        void enqueue(std::function<void()> task);
-        void wait();
-
     private:
         std::vector<std::thread> workers;
         std::queue<std::function<void()>> tasks;
-
-        std::mutex queueMutex;
+        mutable std::mutex queueMutex;
         std::condition_variable condition;
+        std::condition_variable finished;
+        std::atomic<size_t> activeTasks{0};
         std::atomic<bool> stop{false};
-        std::atomic<int> activeTasks{0};
+
+    public:
+        ThreadPool(size_t numThreads) {
+            for (size_t i = 0; i < numThreads; ++i) {
+                workers.emplace_back([this]() {
+                    while (true) {
+                        std::function<void()> task;
+                        {
+                            std::unique_lock<std::mutex> lock(queueMutex);
+                            condition.wait(lock, [this]() {
+                                return stop.load() || !tasks.empty();
+                            });
+                            
+                            if (stop.load() && tasks.empty()) {
+                                return;
+                            }
+                            
+                            task = std::move(tasks.front());
+                            tasks.pop();
+                            activeTasks.fetch_add(1);
+                        }
+                        
+                        // Execute task outside the lock
+                        try {
+                            task();
+                        } catch (...) {
+                            // Handle exceptions to prevent thread termination
+                            // Log error or handle as appropriate for your application
+                        }
+                        
+                        // Notify completion
+                        size_t remaining = activeTasks.fetch_sub(1) - 1;
+                        if (remaining == 0) {
+                            finished.notify_all();
+                        }
+                    }
+                });
+            }
+        }
+
+        ~ThreadPool() {
+            stop.store(true);
+            condition.notify_all();
+            
+            for (std::thread &worker : workers) {
+                if (worker.joinable()) {
+                    worker.join();
+                }
+            }
+        }
+
+        template<typename F>
+        void enqueue(F&& task) {
+            {
+                std::lock_guard<std::mutex> lock(queueMutex);
+                if (stop.load()) {
+                    throw std::runtime_error("ThreadPool is stopped");
+                }
+                tasks.emplace(std::forward<F>(task));
+            }
+            condition.notify_one();
+        }
+
+        void wait() {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            finished.wait(lock, [this]() {
+                return tasks.empty() && activeTasks.load() == 0;
+            });
+        }
+        
+        size_t size() const {
+            return workers.size();
+        }
+        
+        bool empty() const {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            return tasks.empty() && activeTasks.load() == 0;
+        }
     };
 
 
