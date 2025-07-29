@@ -1,10 +1,10 @@
-# Image Deinterlace Tool
+# Image Blur Tool
 
-A high-performance C++ tool for deinterlacing interlaced images using multiple processing modes including CPU, GPU, and multi-threaded approaches.
+A high-performance C++ tool for blurring images using multiple processing modes including CPU, GPU, and multi-threaded approaches.
 
 ## Features
 
-- **Multiple Processing Modes**: CPU, GPU (OpenGL), async, multi-threaded, and SIMD deinterlacing
+- **Multiple Processing Modes**: CPU, GPU (OpenGL), async, multi-threaded, and SIMD blurring
 - **FFmpeg Integration**: Built on FFmpeg for robust image format support
 - **Linux Support**: Optimized for Linux systems
 - **High Performance**: GPU acceleration with OpenGL compute shaders and SIMD vectorization
@@ -36,20 +36,20 @@ A `Dockerfile` is provided for easy building and running of the project in a con
 
 ```bash
 # Build the Docker image
-sudo docker build -t img-deinterlace .
+sudo docker build -t img-blur .
 
 # Start a container and open a shell
-sudo docker run -it --rm img-deinterlace
+sudo docker run -it --rm img-blur
 
 # Inside the container, you can run:
-./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --help
+./bin/Debug-linux-x86_64/img_blur/img_blur --help
 ```
 
 You can also mount a local directory to the container to process your own images:
 
 ```bash
-sudo docker run -it --rm -v /path/to/images:/data img-deinterlace \
-  ./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --input /data/in.jpg --output /data/out.jpg
+sudo docker run -it --rm -v /path/to/images:/data img-blur \
+  ./bin/Debug-linux-x86_64/img_blur/img_blur --input /data/in.jpg --output /data/out.jpg
 ```
 
 **Note**: For GPU mode in Docker, you'll need to start a virtual display server (Xvfb). See the [Troubleshooting](#troubleshooting) section for details.
@@ -58,33 +58,33 @@ sudo docker run -it --rm -v /path/to/images:/data img-deinterlace \
 
 ```bash
 # Basic usage
-img_deinterlace --input interlaced.jpg --output deinterlaced.jpg
+img_blur --input input.jpg --output blurred.jpg
 
 # GPU acceleration
-img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode gpu
+img_blur -i input.jpg -o blurred.jpg --mode gpu
 
 # Multi-threaded processing
-img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode threads
+img_blur -i input.jpg -o blurred.jpg --mode threads
 
 # SIMD-optimized processing
-img_deinterlace -i interlaced.jpg -o deinterlaced.jpg --mode simd
+img_blur -i input.jpg -o blurred.jpg --mode simd
 ```
 
 ## Example Result
 
-Below is an example image showing the effect of deinterlacing. The image is wide, with the original (interlaced) version on the left and the deinterlaced result on the right:
+Below is an example image showing the effect of blurring. The image is wide, with the original version on the left and the blurred result on the right:
 
-![Deinterlacing Example](examples/example1.jpg)
+![Blurring Example](examples/example1.jpg)
 
 ## Processing Modes
 
-| Mode | Description | Requirements |
-|------|-------------|--------------|
-| `default` | CPU-based blending | Any CPU |
-| `async` | Asynchronous processing | Multi-core CPU |
-| `threads` | Multi-threaded processing | Multi-core CPU |
-| `gpu` | GPU acceleration | OpenGL 4.3+ |
-| `simd` | SIMD-optimized processing | CPU with AVX2 support |
+| Mode      | Description                | Requirements         |
+|-----------|----------------------------|----------------------|
+| `default` | CPU-based blending         | Any CPU              |
+| `async`   | Asynchronous processing    | Multi-core CPU       |
+| `threads` | Multi-threaded processing  | Multi-core CPU       |
+| `gpu`     | GPU acceleration           | OpenGL 4.3+          |
+| `simd`    | SIMD-optimized processing  | CPU with AVX2 support|
 
 ## Command Line Options
 
@@ -105,7 +105,7 @@ Below is an example image showing the effect of deinterlacing. The image is wide
 The tool uses a pipeline architecture with three main components:
 
 1. **Decoder** (`FFmpegDecNode`): Reads and decodes input images using FFmpeg
-2. **Processor** (`Deinterlace*ProcNode`): Applies deinterlacing algorithms
+2. **Processor** (`Blur*ProcNode`): Applies blurring algorithms
 3. **Encoder** (`FFmpegEncNode`): Encodes and writes output images using FFmpeg
 
 ### Dependencies
@@ -114,11 +114,6 @@ The tool uses a pipeline architecture with three main components:
 - **GLFW**: Window management and OpenGL context creation
 - **GLAD**: OpenGL loading library
 
-## Algorithm
-
-The deinterlacing algorithm blends odd and even scan lines:
-- Even lines (0, 2, 4...) remain unchanged
-- Odd lines (1, 3, 5...) are blended with the previous line: `new = (current + previous) / 2`
 
 ### SIMD Optimization
 
@@ -138,7 +133,7 @@ src/
 │   ├── base/               # Base classes
 │   ├── FFmpegDecNode       # Image decoder
 │   ├── FFmpegEncNode       # Image encoder
-│   └── Deinterlace*ProcNode # Processing nodes
+│   └── Blur*ProcNode       # Processing nodes
 ```
 
 ### Adding New Processing Modes
@@ -159,12 +154,12 @@ When running GPU mode in Docker containers, you need to start a virtual display 
 
 ```bash
 # Run container with GPU mode
-docker run -it --rm img-deinterlace bash
+docker run -it --rm img-blur bash
 
 # Inside container, start Xvfb and run the tool
 export DISPLAY=:99
 Xvfb :99 -screen 0 1024x768x24 &
-./bin/Debug-linux-x86_64/img_deinterlace/img_deinterlace --input input.jpg --output output.jpg --mode gpu
+./bin/Debug-linux-x86_64/img_blur/img_blur --input input.jpg --output output.jpg --mode gpu
 ```
 
 ### SIMD Mode Issues

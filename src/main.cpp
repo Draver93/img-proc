@@ -36,11 +36,11 @@ void printHelp() {
     std::cout << R"(Image Blur Tool
 
 Usage:
-  img_deinterlace --input <input_file> [--output <output_file>] [--mode <mode>]
-  img_deinterlace -i <input_file> [-o <output_file>] [-m <mode>]
+  img_blur --input <input_file> [--output <output_file>] [--mode <mode>]
+  img_blur -i <input_file> [-o <output_file>] [-m <mode>]
 
 Description:
-  This tool processes an interlaced image and outputs a deinterlaced version.
+  This tool applies a blur effect to an image.
 
 Options:
   --input, -i     Path to the input image file. (Required)
@@ -57,9 +57,9 @@ Processing Modes:
   simd            SIMD-optimized processing using CPU vector instructions
 
 Example:
-  img_deinterlace --input video_frame.jpeg --output frame_fixed.jpeg --mode simd
-  img_deinterlace -i frame.jpg -m gpu
-  img_deinterlace --input interlaced.png --mode threads
+  img_blur --input photo.jpeg --output photo_blurred.jpeg --mode simd
+  img_blur -i photo.jpg -m gpu
+  img_blur --input original.png --mode threads
 )";
 }
 

@@ -2,7 +2,7 @@
  * Premake5 Build Configuration
  * ============================
  * 
- * Build configuration for the Image Deinterlace Tool using Premake5.
+ * Build configuration for the Image Blur Tool using Premake5.
  * Defines project structure, dependencies, and build settings for
  * Linux platform.
  * 
@@ -15,16 +15,16 @@ newoption {
     description = "Enable SIMD (AVX2) support for image processing"
 }
 
-workspace "img_deinterlace"
+workspace "img_blur"
     configurations { "Debug", "Release" }
     architecture "x86_64"
-    startproject "img_deinterlace"
+    startproject "img_blur"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 dofile("external/glfw-premake5.lua")
 
-project "img_deinterlace"
+project "img_blur"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
