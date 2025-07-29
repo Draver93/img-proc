@@ -11,7 +11,7 @@ namespace media_proc {
     BlurAsyncProcNode::~BlurAsyncProcNode() { }
 
     void BlurAsyncProcNode::blend(AVFrame* frame) {
-        img_deinterlace::Timer timer("Running blend with mode: async");
+        media_proc::Timer timer("Running blend with mode: async");
 
         if (!frame || !frame->data[0]) throw std::runtime_error("Invalid frame data");
 

@@ -64,7 +64,7 @@ Example:
 }
 
 int main(int argc, char* argv[]) {
-    img_deinterlace::CommandLineParser parser(argc, argv);
+    media_proc::CommandLineParser parser(argc, argv);
     if (parser.getOptCount() == 0 || parser.hasOption("--help") || parser.hasOption("-h")) { printHelp(); return 0; }
 
     std::string inputFilename;
@@ -82,55 +82,55 @@ int main(int argc, char* argv[]) {
     std::string pipelineMode = parser.getOption("--mode", "default");
     if(pipelineMode == "default") pipelineMode = parser.getOption("-m", "default");
 
-    std::unique_ptr<img_deinterlace::PipelineNode> rootNode = nullptr;
+    std::unique_ptr<media_proc::PipelineNode> rootNode = nullptr;
     
     if(pipelineMode == "default") {
-      img_deinterlace::Timer timer("Running pipeline with mode: default");
+      media_proc::Timer timer("Running pipeline with mode: default");
 
-      rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-      std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurProcNode>();
-      std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+      rootNode = std::make_unique<media_proc::FFmpegDecNode>(inputFilename);
+      std::unique_ptr<media_proc::PipelineNode> processor = std::make_unique<media_proc::BlurProcNode>();
+      std::unique_ptr<media_proc::PipelineNode> encoder = std::make_unique<media_proc::FFmpegEncNode>(outputFilename);
       processor->setNext(std::move(encoder));
       rootNode->setNext(std::move(processor));
       rootNode->execute();
     }
     else if(pipelineMode == "async") {
-        img_deinterlace::Timer timer("Running pipeline with mode: async");
+        media_proc::Timer timer("Running pipeline with mode: async");
 
-        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurAsyncProcNode>();
-        std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+        rootNode = std::make_unique<media_proc::FFmpegDecNode>(inputFilename);
+        std::unique_ptr<media_proc::PipelineNode> processor = std::make_unique<media_proc::BlurAsyncProcNode>();
+        std::unique_ptr<media_proc::PipelineNode> encoder = std::make_unique<media_proc::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
         rootNode->execute();
     }
     else if(pipelineMode == "threads") {
-        img_deinterlace::Timer timer("Running pipeline with mode: threads");
+        media_proc::Timer timer("Running pipeline with mode: threads");
 
-        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurThreadProcNode>();
-        std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+        rootNode = std::make_unique<media_proc::FFmpegDecNode>(inputFilename);
+        std::unique_ptr<media_proc::PipelineNode> processor = std::make_unique<media_proc::BlurThreadProcNode>();
+        std::unique_ptr<media_proc::PipelineNode> encoder = std::make_unique<media_proc::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
         rootNode->execute();
     }
     else if(pipelineMode == "gpu") {
-        img_deinterlace::Timer timer("Running pipeline with mode: gpu");
+        media_proc::Timer timer("Running pipeline with mode: gpu");
 
-        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurGPUProcNode>();
-        std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+        rootNode = std::make_unique<media_proc::FFmpegDecNode>(inputFilename);
+        std::unique_ptr<media_proc::PipelineNode> processor = std::make_unique<media_proc::BlurGPUProcNode>();
+        std::unique_ptr<media_proc::PipelineNode> encoder = std::make_unique<media_proc::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
         rootNode->execute();
     }
     else if(pipelineMode == "simd") {
       #ifdef USE_SIMD
-        img_deinterlace::Timer timer("Running pipeline with mode: SIMD");
+        media_proc::Timer timer("Running pipeline with mode: SIMD");
 
-        rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurSIMDProcNode>();
-        std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
+        rootNode = std::make_unique<media_proc::FFmpegDecNode>(inputFilename);
+        std::unique_ptr<media_proc::PipelineNode> processor = std::make_unique<media_proc::BlurSIMDProcNode>();
+        std::unique_ptr<media_proc::PipelineNode> encoder = std::make_unique<media_proc::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
         rootNode->execute();

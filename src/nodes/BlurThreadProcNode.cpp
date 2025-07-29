@@ -57,7 +57,7 @@ namespace media_proc {
     BlurThreadProcNode::~BlurThreadProcNode() { }
 
     void BlurThreadProcNode::blend(AVFrame* frame) {
-        img_deinterlace::Timer timer("Running blend with mode: threads");
+        media_proc::Timer timer("Running blend with mode: threads");
 
         if (!frame || !frame->data[0]) throw std::runtime_error("Invalid frame data");
 

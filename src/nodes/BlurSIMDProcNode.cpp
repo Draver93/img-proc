@@ -12,7 +12,7 @@ namespace media_proc {
     }
 
     void BlurSIMDProcNode::blend(AVFrame* frame) {
-        img_deinterlace::Timer timer("Running blend with mode: SIMD");
+        media_proc::Timer timer("Running blend with mode: SIMD");
 
         if (!frame || !frame->data[0]) 
             throw std::runtime_error("Invalid frame data");

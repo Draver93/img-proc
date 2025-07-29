@@ -93,7 +93,7 @@ namespace media_proc {
     }
 
     void BlurGPUProcNode::blend(AVFrame* frame) {
-        img_deinterlace::Timer timer("Running blend with mode: GPU");
+        media_proc::Timer timer("Running blend with mode: GPU");
 
         if (!frame || !frame->data[0]) {
             throw std::runtime_error("Invalid frame data");
@@ -135,6 +135,14 @@ namespace media_proc {
 
             glBindTexture(GL_TEXTURE_2D, m_OutputTextures[textureSize]);
             glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, data);
+        }
+
+        GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+        while (true) {
+            GLenum result = glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1000); // wait up to 0.1ms
+            if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED)
+                break;
         }
     }
 

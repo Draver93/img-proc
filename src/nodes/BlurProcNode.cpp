@@ -8,7 +8,7 @@ namespace media_proc {
     }
 
     void BlurProcNode::blend(AVFrame* frame) {
-        img_deinterlace::Timer timer("Running blend with mode: default");
+        media_proc::Timer timer("Running blend with mode: default");
 
         if (!frame || !frame->data[0])  throw std::runtime_error("Invalid frame data");
 
