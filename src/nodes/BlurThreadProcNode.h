@@ -1,5 +1,5 @@
 /*
- * Thread Deinterlace Processor Node
+ * Thread Blur Processor Node
  * ==================================
  * 
  * Multi-threaded deinterlacing implementation using std::thread.
@@ -22,7 +22,7 @@
 #include <functional>
 #include <condition_variable>
 
-namespace img_deinterlace {
+namespace media_proc {
     class ThreadPool {
     public:
         ThreadPool(size_t numThreads);
@@ -42,10 +42,10 @@ namespace img_deinterlace {
     };
 
 
-    class DeinterlaceThreadProcNode : public Processor {
+    class BlurThreadProcNode : public Processor {
     public:
-        DeinterlaceThreadProcNode();
-        ~DeinterlaceThreadProcNode();
+        BlurThreadProcNode();
+        ~BlurThreadProcNode();
         
     private:
         void blend(AVFrame* frame);

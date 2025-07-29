@@ -1,17 +1,17 @@
-#include "DeinterlaceSIMDProcNode.h"
+#include "BlurSIMDProcNode.h"
 
 #ifdef USE_SIMD
 
 #include <immintrin.h> // AVX2
 
-namespace img_deinterlace {
+namespace media_proc {
 
-    DeinterlaceSIMDProcNode::DeinterlaceSIMDProcNode() { }
-    DeinterlaceSIMDProcNode::~DeinterlaceSIMDProcNode() { 
+    BlurSIMDProcNode::BlurSIMDProcNode() { }
+    BlurSIMDProcNode::~BlurSIMDProcNode() { 
         
     }
 
-    void DeinterlaceSIMDProcNode::blend(AVFrame* frame) {
+    void BlurSIMDProcNode::blend(AVFrame* frame) {
         img_deinterlace::Timer timer("Running blend with mode: SIMD");
 
         if (!frame || !frame->data[0]) 
@@ -56,7 +56,7 @@ namespace img_deinterlace {
         }
     }
 
-    void DeinterlaceSIMDProcNode::init(std::shared_ptr<const PipelineContext> context) {
+    void BlurSIMDProcNode::init(std::shared_ptr<const PipelineContext> context) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(context->pixelFormat);
         if (desc) {
            if (!(desc->flags & AV_PIX_FMT_FLAG_PLANAR)) m_PlaneCount = 1;
@@ -65,7 +65,7 @@ namespace img_deinterlace {
         }
     }
 
-    std::unique_ptr<PipelinePacket> DeinterlaceSIMDProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
+    std::unique_ptr<PipelinePacket> BlurSIMDProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
         if(packet) blend(packet->frame);
         return std::move(packet);
     };

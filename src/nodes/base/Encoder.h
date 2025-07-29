@@ -16,7 +16,7 @@
 #include <StdAfx.h>
 #include "Pipeline.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
     //Template Method
     class Encoder : public PipelineNode {

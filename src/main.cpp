@@ -1,5 +1,5 @@
 /*
- * Image Deinterlace Tool
+ * Image Blur Tool
  * ======================
  * 
  * A high-performance C++ tool for deinterlacing interlaced images using
@@ -26,14 +26,14 @@
 #include "nodes/FFmpegEncNode.h"
 #include "nodes/FFmpegDecNode.h"
 
-#include "nodes/DeinterlaceProcNode.h"
-#include "nodes/DeinterlaceAsyncProcNode.h"
-#include "nodes/DeinterlaceThreadProcNode.h"
-#include "nodes/DeinterlaceGPUProcNode.h"
-#include "nodes/DeinterlaceSIMDProcNode.h"
+#include "nodes/BlurProcNode.h"
+#include "nodes/BlurAsyncProcNode.h"
+#include "nodes/BlurThreadProcNode.h"
+#include "nodes/BlurGPUProcNode.h"
+#include "nodes/BlurSIMDProcNode.h"
 
 void printHelp() {
-    std::cout << R"(Image Deinterlace Tool
+    std::cout << R"(Image Blur Tool
 
 Usage:
   img_deinterlace --input <input_file> [--output <output_file>] [--mode <mode>]
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
       img_deinterlace::Timer timer("Running pipeline with mode: default");
 
       rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-      std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceProcNode>();
+      std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurProcNode>();
       std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
       processor->setNext(std::move(encoder));
       rootNode->setNext(std::move(processor));
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
         img_deinterlace::Timer timer("Running pipeline with mode: async");
 
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceAsyncProcNode>();
+        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurAsyncProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
         img_deinterlace::Timer timer("Running pipeline with mode: threads");
 
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceThreadProcNode>();
+        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurThreadProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
         img_deinterlace::Timer timer("Running pipeline with mode: gpu");
 
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceGPUProcNode>();
+        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurGPUProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
         img_deinterlace::Timer timer("Running pipeline with mode: SIMD");
 
         rootNode = std::make_unique<img_deinterlace::FFmpegDecNode>(inputFilename);
-        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::DeinterlaceSIMDProcNode>();
+        std::unique_ptr<img_deinterlace::PipelineNode> processor = std::make_unique<img_deinterlace::BlurSIMDProcNode>();
         std::unique_ptr<img_deinterlace::PipelineNode> encoder = std::make_unique<img_deinterlace::FFmpegEncNode>(outputFilename);
         processor->setNext(std::move(encoder));
         rootNode->setNext(std::move(processor));

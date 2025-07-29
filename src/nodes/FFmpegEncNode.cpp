@@ -18,7 +18,7 @@ static AVCodecID codecIdFromExtension(const std::string& filename) {
     throw std::runtime_error("Unknown image extension: " + ext);
 }
 
-namespace img_deinterlace {
+namespace media_proc {
 
     FFmpegEncNode::~FFmpegEncNode() {
         av_packet_free(&m_Packet);

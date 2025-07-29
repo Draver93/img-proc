@@ -15,7 +15,7 @@
 
 #include "base/Decoder.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
     class FFmpegDecNode : public Decoder {
     public:

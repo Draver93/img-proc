@@ -1,10 +1,10 @@
-#include "DeinterlaceThreadProcNode.h"
+#include "BlurThreadProcNode.h"
 
 #include <vector>
 #include <thread>
 
 
-namespace img_deinterlace {
+namespace media_proc {
 
     ThreadPool::ThreadPool(size_t numThreads) {
         for (size_t i = 0; i < numThreads; ++i) {
@@ -53,10 +53,10 @@ namespace img_deinterlace {
     }
 
 
-    DeinterlaceThreadProcNode::DeinterlaceThreadProcNode() : m_Pool(std::thread::hardware_concurrency()) { }
-    DeinterlaceThreadProcNode::~DeinterlaceThreadProcNode() { }
+    BlurThreadProcNode::BlurThreadProcNode() : m_Pool(std::thread::hardware_concurrency()) { }
+    BlurThreadProcNode::~BlurThreadProcNode() { }
 
-    void DeinterlaceThreadProcNode::blend(AVFrame* frame) {
+    void BlurThreadProcNode::blend(AVFrame* frame) {
         img_deinterlace::Timer timer("Running blend with mode: threads");
 
         if (!frame || !frame->data[0]) throw std::runtime_error("Invalid frame data");
@@ -88,7 +88,7 @@ namespace img_deinterlace {
         m_Pool.wait(); // Wait for all lines to finish
     }
 
-    void DeinterlaceThreadProcNode::init(std::shared_ptr<const PipelineContext> context) {
+    void BlurThreadProcNode::init(std::shared_ptr<const PipelineContext> context) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(context->pixelFormat);
         if (desc) {
            if (!(desc->flags & AV_PIX_FMT_FLAG_PLANAR)) m_PlaneCount = 1;
@@ -97,7 +97,7 @@ namespace img_deinterlace {
         }
     }
 
-    std::unique_ptr<PipelinePacket> DeinterlaceThreadProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
+    std::unique_ptr<PipelinePacket> BlurThreadProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
         if(packet) blend(packet->frame);
         return std::move(packet);
     };

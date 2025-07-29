@@ -1,5 +1,5 @@
 /*
- * Async Deinterlace Processor Node
+ * Async Blur Processor Node
  * =================================
  * 
  * Asynchronous deinterlacing implementation using std::async and std::future.
@@ -15,12 +15,12 @@
 
 #include "base/Processor.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
-    class DeinterlaceAsyncProcNode : public Processor {
+    class BlurAsyncProcNode : public Processor {
     public:
-        DeinterlaceAsyncProcNode();
-        ~DeinterlaceAsyncProcNode();
+        BlurAsyncProcNode();
+        ~BlurAsyncProcNode();
         
     private:
         void blend(AVFrame* frame);

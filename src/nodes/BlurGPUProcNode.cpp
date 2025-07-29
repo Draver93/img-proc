@@ -1,9 +1,9 @@
-#include "DeinterlaceGPUProcNode.h"
+#include "BlurGPUProcNode.h"
 
 #include <vector>
 #include <thread>
 
-namespace img_deinterlace {
+namespace media_proc {
 
     const char* blendShaderSource = R"(
         #version 430
@@ -41,8 +41,8 @@ namespace img_deinterlace {
         }
     )";
 
-    DeinterlaceGPUProcNode::DeinterlaceGPUProcNode() { }
-    DeinterlaceGPUProcNode::~DeinterlaceGPUProcNode() { 
+    BlurGPUProcNode::BlurGPUProcNode() { }
+    BlurGPUProcNode::~BlurGPUProcNode() { 
         if (m_ShaderProgram) glDeleteProgram(m_ShaderProgram);
         for (auto &[key, texture] : m_InputTextures) glDeleteTextures(1, &texture);
         for (auto &[key, texture] : m_OutputTextures) glDeleteTextures(1, &texture);
@@ -54,7 +54,7 @@ namespace img_deinterlace {
         }
     }
 
-    void DeinterlaceGPUProcNode::compileShader() {
+    void BlurGPUProcNode::compileShader() {
         GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
         glShaderSource(shader, 1, &blendShaderSource, nullptr);
         glCompileShader(shader);
@@ -77,7 +77,7 @@ namespace img_deinterlace {
         m_UniformHeightLoc = glGetUniformLocation(m_ShaderProgram, "height");
     }
 
-    void DeinterlaceGPUProcNode::createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int height) {
+    void BlurGPUProcNode::createTextures(const AVPixFmtDescriptor *desc, const std::vector<int> &linesizes, int height) {
         for(int plane = 0; plane < desc->nb_components; plane++) {
             std::pair<int, int> textureSize = { linesizes[plane], (plane > 0 ? height >> m_PixelFormatDesc->log2_chroma_h : height) };
 
@@ -92,7 +92,7 @@ namespace img_deinterlace {
         }
     }
 
-    void DeinterlaceGPUProcNode::blend(AVFrame* frame) {
+    void BlurGPUProcNode::blend(AVFrame* frame) {
         img_deinterlace::Timer timer("Running blend with mode: GPU");
 
         if (!frame || !frame->data[0]) {
@@ -138,7 +138,7 @@ namespace img_deinterlace {
         }
     }
 
-    void DeinterlaceGPUProcNode::init(std::shared_ptr<const PipelineContext> context) {
+    void BlurGPUProcNode::init(std::shared_ptr<const PipelineContext> context) {
 
         if (!glfwInit()) { throw std::runtime_error("GLFW initialization failed!"); }
 
@@ -147,7 +147,7 @@ namespace img_deinterlace {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-        m_GLFWInstance = glfwCreateWindow(1, 1, "DeinterlaceGPUProcNode", nullptr, nullptr);
+        m_GLFWInstance = glfwCreateWindow(1, 1, "BlurGPUProcNode", nullptr, nullptr);
         if (!m_GLFWInstance) {
             glfwTerminate();
             throw std::runtime_error("GLFW window creation failed!");
@@ -177,7 +177,7 @@ namespace img_deinterlace {
         createTextures(m_PixelFormatDesc, context->linesizes, context->height);
     }
 
-    std::unique_ptr<PipelinePacket> DeinterlaceGPUProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
+    std::unique_ptr<PipelinePacket> BlurGPUProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
         if(packet) blend(packet->frame);
         return std::move(packet);
     };

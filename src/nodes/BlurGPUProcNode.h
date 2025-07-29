@@ -1,5 +1,5 @@
 /*
- * GPU Deinterlace Processor Node
+ * GPU Blur Processor Node
  * ==============================
  * 
  * GPU-accelerated deinterlacing implementation using OpenGL compute shaders.
@@ -16,7 +16,7 @@
 
 #include <unordered_map>
 
-namespace img_deinterlace {
+namespace media_proc {
 
     struct PairHash {
         template <typename T1, typename T2>
@@ -27,10 +27,10 @@ namespace img_deinterlace {
         }
     };
 
-    class DeinterlaceGPUProcNode : public Processor {
+    class BlurGPUProcNode : public Processor {
     public:
-        DeinterlaceGPUProcNode();
-        ~DeinterlaceGPUProcNode();
+        BlurGPUProcNode();
+        ~BlurGPUProcNode();
     
     private:
         void compileShader();

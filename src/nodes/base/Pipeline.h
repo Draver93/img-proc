@@ -15,7 +15,7 @@
 
 #include <StdAfx.h>
 
-namespace img_deinterlace {
+namespace media_proc {
     class PipelineContext {
     public:
         std::vector<int> linesizes;

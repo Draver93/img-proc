@@ -1,13 +1,13 @@
-#include "DeinterlaceProcNode.h"
+#include "BlurProcNode.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
-    DeinterlaceProcNode::DeinterlaceProcNode() { }
-    DeinterlaceProcNode::~DeinterlaceProcNode() { 
+    BlurProcNode::BlurProcNode() { }
+    BlurProcNode::~BlurProcNode() { 
         
     }
 
-    void DeinterlaceProcNode::blend(AVFrame* frame) {
+    void BlurProcNode::blend(AVFrame* frame) {
         img_deinterlace::Timer timer("Running blend with mode: default");
 
         if (!frame || !frame->data[0])  throw std::runtime_error("Invalid frame data");
@@ -35,7 +35,7 @@ namespace img_deinterlace {
         }
     }
 
-    void DeinterlaceProcNode::init(std::shared_ptr<const PipelineContext> context) {
+    void BlurProcNode::init(std::shared_ptr<const PipelineContext> context) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(context->pixelFormat);
         if (desc) {
            if (!(desc->flags & AV_PIX_FMT_FLAG_PLANAR)) m_PlaneCount = 1;
@@ -44,7 +44,7 @@ namespace img_deinterlace {
         }
     }
 
-    std::unique_ptr<PipelinePacket> DeinterlaceProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
+    std::unique_ptr<PipelinePacket> BlurProcNode::updatePacket(std::unique_ptr<PipelinePacket> packet) {
         if(packet) blend(packet->frame);
         return std::move(packet);
     };

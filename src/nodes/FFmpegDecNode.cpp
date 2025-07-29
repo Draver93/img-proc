@@ -1,6 +1,6 @@
 #include "FFmpegDecNode.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
     FFmpegDecNode::~FFmpegDecNode() {
         av_packet_free(&m_Packet);

@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <regex>
 
-namespace img_deinterlace {
+namespace media_proc {
 
 	class Context {
 	public:

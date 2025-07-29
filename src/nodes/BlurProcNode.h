@@ -1,5 +1,5 @@
 /*
- * Deinterlace Processor Node
+ * Blur Processor Node
  * ==========================
  * 
  * CPU-based deinterlacing implementation using simple line blending.
@@ -9,19 +9,18 @@
  * License: MIT
  */
 
-#ifndef IMG_DEINT_SIMD_PROCESSOR_NODE_H
-#define IMG_DEINT_SIMD_PROCESSOR_NODE_H
+#ifndef IMG_DEINT_PROCESSOR_NODE_H
+#define IMG_DEINT_PROCESSOR_NODE_H
 
-#ifdef USE_SIMD
 
 #include "base/Processor.h"
 
-namespace img_deinterlace {
+namespace media_proc {
 
-    class DeinterlaceSIMDProcNode : public Processor {
+    class BlurProcNode : public Processor {
     public:
-        DeinterlaceSIMDProcNode();
-        ~DeinterlaceSIMDProcNode();
+        BlurProcNode();
+        ~BlurProcNode();
         
     private:
         void blend(AVFrame* frame);
@@ -36,6 +35,5 @@ namespace img_deinterlace {
     };
 }
 
-#endif
 
-#endif //!IMG_DEINT_SIMD_PROCESSOR_NODE_H
+#endif //!IMG_DEINT_PROCESSOR_NODE_H

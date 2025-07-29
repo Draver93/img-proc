@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <regex>
 
-namespace img_deinterlace {
+namespace media_proc {
 	class DoubleDashExpression : public Expression {
 	public:
 		void interpret(Context& ctx, const std::vector<std::string>& args) override {

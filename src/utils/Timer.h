@@ -6,7 +6,7 @@
 #include <string>
 
 
-namespace img_deinterlace
+namespace media_proc
 {
     class Timer {
     public:
