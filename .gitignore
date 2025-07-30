@@ -56,7 +56,7 @@ cmake_install.cmake
 *.pyc
 __pycache__/
 
-!examples/*.jpg
+!examples/*.png
 !premake5
 !premake5a15
 !premake5.exe
