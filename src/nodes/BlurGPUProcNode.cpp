@@ -9,9 +9,9 @@ const char* blurShaderSource = R"(
     #version 430
     layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-    // Bindings for 8-bit input/output images
-    layout(binding = 0, r8ui) uniform readonly uimage2D inputImage;
-    layout(binding = 1, r8ui) uniform writeonly uimage2D outputImage;
+    // Bindings for RGBA input/output images
+    layout(binding = 0, rgba8ui) uniform readonly uimage2D inputImage;
+    layout(binding = 1, rgba8ui) uniform writeonly uimage2D outputImage;
 
     uniform int width;
     uniform int height;
@@ -40,23 +40,23 @@ const char* blurShaderSource = R"(
         
         // Handle border pixels - just copy original
         if (x == 0 || y == 0 || x == uint(width - 1) || y == uint(height - 1)) {
-            uint value = imageLoad(inputImage, coord).r;
-            imageStore(outputImage, coord, uvec4(value, 0, 0, 0));
+            uvec4 value = imageLoad(inputImage, coord);
+            imageStore(outputImage, coord, value);
             return;
         }
         
-        // Apply 3x3 Gaussian blur
-        uint sum = 0;
+        // Apply 3x3 Gaussian blur to each channel
+        uvec4 sum = uvec4(0, 0, 0, 0);
         
         for (int i = 0; i < 9; i++) {
             ivec2 sampleCoord = coord + offsets[i];
-            uint pixelValue = imageLoad(inputImage, sampleCoord).r;
+            uvec4 pixelValue = imageLoad(inputImage, sampleCoord);
             sum += pixelValue * uint(kernel[i]);
         }
         
         // Divide by 256 (total kernel weight) and store result
-        uint blurred = sum >> 8;  // Equivalent to sum / 256
-        imageStore(outputImage, coord, uvec4(blurred, 0, 0, 0));
+        uvec4 blurred = sum >> 8;  // Equivalent to sum / 256
+        imageStore(outputImage, coord, blurred);
     }
     )";
 
@@ -75,7 +75,7 @@ const char* blurShaderSource = R"(
 
     void BlurGPUProcNode::compileShader() {
         GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
-        glShaderSource(shader, 1, &blendShaderSource, nullptr);
+        glShaderSource(shader, 1, &blurShaderSource, nullptr);
         glCompileShader(shader);
 
         // Check for compilation errors
