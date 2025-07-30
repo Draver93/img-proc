@@ -74,7 +74,7 @@ img_blur -i input.jpg -o blurred.jpg --mode simd
 
 Below is an example image showing the effect of blurring. The image is wide, with the original version on the left and the blurred result on the right:
 
-![Blurring Example](examples/example1.jpg)
+![Blurring Example](examples/example1.png)
 
 ## Processing Modes
 
